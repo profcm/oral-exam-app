@@ -614,7 +614,7 @@ window.addEventListener('DOMContentLoaded', function() {
           var base64Data = reader.result.split(',')[1];
           var fileName = state.date.replace(/\//g, '-') + '_' + (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + state.examId + '.webm';
           callBackend({ action: 'audio', base64Data: base64Data, mimeType: recordedMimeType, fileName: fileName })
-            .then(function(res) { discardAudio(); completeReset(res && res.success ? res.url : null); })
+            .then(function(res) {   discardAudio();   if (res && res.success) {     completeReset(res.url);   } else {     alert('Error uploading audio to Drive: ' + (res ? res.error : 'Unknown error'));     completeReset(null);   } }) .catch(function(err) {   discardAudio();   alert('Network error uploading audio: ' + err);   completeReset(null); });
             .catch(function() { discardAudio(); completeReset(null); });
         };
         reader.readAsDataURL(blob);
