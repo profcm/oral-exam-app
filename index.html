@@ -20,7 +20,6 @@
     }
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); font-size: 13px; }
-    
     header {
       background: var(--primary); color: white; padding: 6px 14px;
       display: flex; justify-content: space-between; align-items: center;
@@ -35,7 +34,6 @@
     .dot.saved { background: #4ade80; }
     .dot.saving { background: #facc15; }
     .dot.offline { background: #f87171; }
-
     .header-controls { display: flex; align-items: center; gap: 8px; }
     .timer-box {
       background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 6px;
@@ -47,14 +45,12 @@
     }
     .rec-dot { width: 6px; height: 6px; border-radius: 50%; background: white; animation: blink 1s infinite; }
     @keyframes blink { 50% { opacity: 0.2; } }
-
     .timer-display { font-weight: 700; font-size: 0.9rem; min-width: 44px; text-align: center; }
     .btn-sm {
       background: rgba(255,255,255,0.2); border: none; color: white;
       padding: 3px 7px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600;
     }
     .btn-sm:hover { background: rgba(255,255,255,0.3); }
-
     .main-grid {
       max-width: 1280px; margin: 8px auto; padding: 0 10px;
       display: grid; grid-template-columns: 1.02fr 1fr; gap: 10px; align-items: start;
@@ -70,7 +66,6 @@
       display: flex; justify-content: space-between; align-items: center;
     }
     .session-lock-note { font-size: 0.68rem; color: var(--muted); font-weight: normal; text-transform: none; }
-
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
     .field { display: flex; flex-direction: column; gap: 2px; }
     label { font-size: 0.72rem; font-weight: 600; color: var(--muted); }
@@ -79,7 +74,6 @@
       font-size: 0.85rem; color: var(--text); width: 100%;
     }
     input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(30,58,138,0.12); }
-
     .rubric-row {
       display: grid; grid-template-columns: 130px 1fr; align-items: center;
       padding: 4px 0; border-bottom: 1px solid #f1f5f9; gap: 6px;
@@ -97,7 +91,6 @@
     .scale-btn.active[data-val="Good"] { background: var(--good); color: white; border-color: var(--good); }
     .scale-btn.active[data-val="Fair"] { background: var(--fair); color: white; border-color: var(--fair); }
     .scale-btn.active[data-val="Unsatisfactory"] { background: var(--unsat); color: white; border-color: var(--unsat); }
-
     .chip-section { margin-bottom: 6px; }
     .chip-group-title { font-size: 0.68rem; font-weight: 700; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; }
     .chips-wrap { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -107,16 +100,12 @@
       cursor: pointer; user-select: none; transition: 0.08s;
     }
     .chip:active { transform: scale(0.95); background: #dbeafe; }
-
     textarea { font-family: 'Cambria', 'Segoe UI', serif; font-size: 0.92rem; line-height: 1.35; resize: vertical; }
-
     .ai-box {
       margin-top: 8px; background: #faf5ff; border: 1px solid #e9d5ff;
       border-radius: 6px; padding: 7px 9px;
     }
-    .ai-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
-    }
+    .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .ai-title { font-size: 0.72rem; font-weight: 700; color: #6b21a8; text-transform: uppercase; }
     .btn-ai {
       background: #7e22ce; color: white; border: none; border-radius: 4px;
@@ -124,11 +113,7 @@
     }
     .btn-ai:hover { background: #6b21a8; }
     .btn-ai:disabled { opacity: 0.6; cursor: wait; }
-    #aiSummary {
-      font-family: 'Segoe UI', sans-serif; font-size: 0.82rem; background: white;
-      border-color: #d8b4fe;
-    }
-
+    #aiSummary { font-family: 'Segoe UI', sans-serif; font-size: 0.82rem; background: white; border-color: #d8b4fe; }
     .bottom-controls {
       display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
       gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9;
@@ -145,12 +130,10 @@
     .btn-outline:hover { background: #f1f5f9; }
     .btn-mail { background: #0f766e; color: white; }
     .btn-mail:hover { background: #115e59; }
-
     .audio-status-line {
       font-size: 0.73rem; color: var(--muted); margin-top: 6px; display: flex; justify-content: space-between;
     }
     .audio-status-line a { color: var(--primary); font-weight: 600; text-decoration: none; }
-
     .modal-backdrop {
       display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55);
       z-index: 200; align-items: center; justify-content: center; padding: 12px;
@@ -169,10 +152,7 @@
       background: #f8fafc; padding: 10px; border-radius: 5px; border: 1px solid #e2e8f0;
       white-space: pre-wrap; font-family: inherit; font-size: 0.82rem; margin: 0 0 10px 0;
     }
-
-    @media (max-width: 820px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 820px) { .main-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -182,18 +162,17 @@
     <span>Oral Exam Evaluator</span>
     <div class="status-badge">
       <span id="statusDot" class="dot saved"></span>
-      <span id="statusText">Ready</span>
+      <span id="statusText">JS Active</span>
     </div>
   </div>
-
   <div class="header-controls">
     <div class="timer-box">
       <span id="recBadge" class="rec-badge"><span class="rec-dot"></span>REC</span>
       <span id="timerDisplay" class="timer-display">00:00</span>
-      <button type="button" class="btn-sm" onclick="toggleTimer()" id="timerToggleBtn">Start</button>
-      <button type="button" class="btn-sm" onclick="resetTimer()">Reset</button>
+      <button type="button" class="btn-sm" id="btnStart">Start</button>
+      <button type="button" class="btn-sm" id="btnReset">Reset</button>
     </div>
-    <button type="button" class="btn-sm" onclick="openHistory()">History</button>
+    <button type="button" class="btn-sm" id="btnHistory">History</button>
   </div>
 </header>
 
@@ -205,98 +184,73 @@
         <span class="session-lock-note">Top row stays locked across exams</span>
       </h2>
       <div class="grid-3" style="margin-bottom: 7px;">
-        <div class="field">
-          <label>Subject</label>
-          <input type="text" id="subject" placeholder="Phonetics II" oninput="handleInput()">
-        </div>
-        <div class="field">
-          <label>Course</label>
-          <input type="text" id="course" placeholder="Comm. A" oninput="handleInput()">
-        </div>
-        <div class="field">
-          <label>Instance</label>
-          <input type="text" id="instance" placeholder="Final Exam" oninput="handleInput()">
-        </div>
+        <div class="field"><label>Subject</label><input type="text" id="subject" placeholder="Phonetics II"></div>
+        <div class="field"><label>Course</label><input type="text" id="course" placeholder="Comm. A"></div>
+        <div class="field"><label>Instance</label><input type="text" id="instance" placeholder="Final Exam"></div>
       </div>
       <div class="grid-3">
-        <div class="field">
-          <label>Student Name</label>
-          <input type="text" id="studentName" placeholder="Surname, Name" oninput="handleInput()">
-        </div>
-        <div class="field">
-          <label>DNI / ID</label>
-          <input type="text" id="dni" placeholder="ID Number" oninput="handleInput()">
-        </div>
-        <div class="field">
-          <label>Email (Optional)</label>
-          <input type="email" id="email" placeholder="student@mail.com" oninput="handleInput()">
-        </div>
+        <div class="field"><label>Student Name</label><input type="text" id="studentName" placeholder="Surname, Name"></div>
+        <div class="field"><label>DNI / ID</label><input type="text" id="dni" placeholder="ID Number"></div>
+        <div class="field"><label>Email (Optional)</label><input type="email" id="email" placeholder="student@mail.com"></div>
       </div>
     </div>
 
     <div class="card">
       <h2 class="card-title">Assessment Rubric</h2>
-      
       <div class="rubric-row">
         <div class="rubric-label">Pronunciation</div>
-        <div class="scale-group" id="scale-pronunciation">
-          <button type="button" class="scale-btn" data-val="Excellent" onclick="selectRubric('pronunciation','Excellent')">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good" onclick="selectRubric('pronunciation','Good')">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair" onclick="selectRubric('pronunciation','Fair')">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory" onclick="selectRubric('pronunciation','Unsatisfactory')">Unsatisfactory</button>
+        <div class="scale-group" data-criterion="pronunciation">
+          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
+          <button type="button" class="scale-btn" data-val="Good">Good</button>
+          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
+          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-
       <div class="rubric-row">
         <div class="rubric-label">Intonation</div>
-        <div class="scale-group" id="scale-intonation">
-          <button type="button" class="scale-btn" data-val="Excellent" onclick="selectRubric('intonation','Excellent')">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good" onclick="selectRubric('intonation','Good')">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair" onclick="selectRubric('intonation','Fair')">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory" onclick="selectRubric('intonation','Unsatisfactory')">Unsatisfactory</button>
+        <div class="scale-group" data-criterion="intonation">
+          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
+          <button type="button" class="scale-btn" data-val="Good">Good</button>
+          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
+          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-
       <div class="rubric-row">
         <div class="rubric-label">Fluency & Rhythm</div>
-        <div class="scale-group" id="scale-fluency">
-          <button type="button" class="scale-btn" data-val="Excellent" onclick="selectRubric('fluency','Excellent')">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good" onclick="selectRubric('fluency','Good')">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair" onclick="selectRubric('fluency','Fair')">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory" onclick="selectRubric('fluency','Unsatisfactory')">Unsatisfactory</button>
+        <div class="scale-group" data-criterion="fluency">
+          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
+          <button type="button" class="scale-btn" data-val="Good">Good</button>
+          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
+          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-
       <div class="rubric-row">
         <div class="rubric-label">Grammar</div>
-        <div class="scale-group" id="scale-grammar">
-          <button type="button" class="scale-btn" data-val="Excellent" onclick="selectRubric('grammar','Excellent')">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good" onclick="selectRubric('grammar','Good')">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair" onclick="selectRubric('grammar','Fair')">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory" onclick="selectRubric('grammar','Unsatisfactory')">Unsatisfactory</button>
+        <div class="scale-group" data-criterion="grammar">
+          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
+          <button type="button" class="scale-btn" data-val="Good">Good</button>
+          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
+          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-
       <div class="rubric-row">
         <div class="rubric-label">Vocabulary</div>
-        <div class="scale-group" id="scale-vocabulary">
-          <button type="button" class="scale-btn" data-val="Excellent" onclick="selectRubric('vocabulary','Excellent')">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good" onclick="selectRubric('vocabulary','Good')">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair" onclick="selectRubric('vocabulary','Fair')">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory" onclick="selectRubric('vocabulary','Unsatisfactory')">Unsatisfactory</button>
+        <div class="scale-group" data-criterion="vocabulary">
+          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
+          <button type="button" class="scale-btn" data-val="Good">Good</button>
+          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
+          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-
       <div class="rubric-row">
         <div class="rubric-label">Intelligibility</div>
-        <div class="scale-group" id="scale-intelligibility">
-          <button type="button" class="scale-btn" data-val="Excellent" onclick="selectRubric('intelligibility','Excellent')">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good" onclick="selectRubric('intelligibility','Good')">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair" onclick="selectRubric('intelligibility','Fair')">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory" onclick="selectRubric('intelligibility','Unsatisfactory')">Unsatisfactory</button>
+        <div class="scale-group" data-criterion="intelligibility">
+          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
+          <button type="button" class="scale-btn" data-val="Good">Good</button>
+          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
+          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-
       <div class="audio-status-line">
         <span id="audioStatus">Audio: Ready (starts with timer)</span>
         <span id="audioLinkBox"></span>
@@ -307,62 +261,55 @@
   <div class="col-stack">
     <div class="card">
       <h2 class="card-title">Quick Tags & Observations</h2>
-      
       <div class="chip-section">
         <div class="chip-group-title">Phonology & Prosody</div>
         <div class="chips-wrap">
-          <span class="chip" onclick="appendTag('Pronunciation')">+ Pronunciation</span>
-          <span class="chip" onclick="appendTag('Stress')">+ Stress</span>
-          <span class="chip" onclick="appendTag('Tonality')">+ Tonality</span>
-          <span class="chip" onclick="appendTag('Tonicity')">+ Tonicity</span>
+          <span class="chip" data-tag="Pronunciation">+ Pronunciation</span>
+          <span class="chip" data-tag="Stress">+ Stress</span>
+          <span class="chip" data-tag="Tonality">+ Tonality</span>
+          <span class="chip" data-tag="Tonicity">+ Tonicity</span>
         </div>
       </div>
-
       <div class="chip-section">
         <div class="chip-group-title">Grammar & Lexis</div>
         <div class="chips-wrap">
-          <span class="chip" onclick="appendTag('Tense')">+ Tense</span>
-          <span class="chip" onclick="appendTag('Grammar')">+ Grammar</span>
-          <span class="chip" onclick="appendTag('Syntax')">+ Syntax</span>
-          <span class="chip" onclick="appendTag('Verb form')">+ Verb form</span>
-          <span class="chip" onclick="appendTag('Form')">+ Form</span>
+          <span class="chip" data-tag="Tense">+ Tense</span>
+          <span class="chip" data-tag="Grammar">+ Grammar</span>
+          <span class="chip" data-tag="Syntax">+ Syntax</span>
+          <span class="chip" data-tag="Verb form">+ Verb form</span>
+          <span class="chip" data-tag="Form">+ Form</span>
         </div>
       </div>
-
       <div class="chip-section">
         <div class="chip-group-title">Fluency & Delivery</div>
         <div class="chips-wrap">
-          <span class="chip" onclick="appendTag('Short Pause')">+ Short Pause</span>
-          <span class="chip" onclick="appendTag('Long Pause')">+ Long Pause</span>
-          <span class="chip" onclick="appendTag('Choppy speaking')">+ Choppy speaking</span>
-          <span class="chip" onclick="appendTag('False start')">+ False start</span>
-          <span class="chip" onclick="appendTag('Hesitant')">+ Hesitant</span>
+          <span class="chip" data-tag="Short Pause">+ Short Pause</span>
+          <span class="chip" data-tag="Long Pause">+ Long Pause</span>
+          <span class="chip" data-tag="Choppy speaking">+ Choppy speaking</span>
+          <span class="chip" data-tag="False start">+ False start</span>
+          <span class="chip" data-tag="Hesitant">+ Hesitant</span>
         </div>
       </div>
-
       <div class="field" style="margin-top: 6px;">
         <label>Notes (Tap tag to insert Tag + 24h time & new line)</label>
-        <textarea id="notes" rows="5" placeholder="Tap tags above or type observations..." oninput="handleInput()"></textarea>
+        <textarea id="notes" rows="5" placeholder="Tap tags above or type observations..."></textarea>
       </div>
-
       <div class="ai-box">
         <div class="ai-header">
           <span class="ai-title">AI Error Summary</span>
-          <button type="button" class="btn-ai" id="aiBtn" onclick="requestAiSummary()">Generate AI Summary</button>
+          <button type="button" class="btn-ai" id="btnAi">Generate AI Summary</button>
         </div>
-        <textarea id="aiSummary" rows="3" placeholder="Click 'Generate AI Summary' to draft academic feedback from your notes..." oninput="handleInput()"></textarea>
+        <textarea id="aiSummary" rows="3" placeholder="Click 'Generate AI Summary' to draft academic feedback..."></textarea>
       </div>
-
       <div class="bottom-controls">
         <div class="field grade-box">
           <label>Final Grade</label>
-          <input type="text" id="finalGrade" placeholder="e.g., 8 / Pass" oninput="handleInput()">
+          <input type="text" id="finalGrade" placeholder="e.g., 8 / Pass">
         </div>
-
         <div class="actions-bar">
-          <button type="button" class="btn btn-outline" onclick="openPreview()">Summary</button>
-          <button type="button" class="btn btn-mail" onclick="sendEmail()">Email</button>
-          <button type="button" class="btn btn-primary" onclick="finishAndNext()">Finish & Next</button>
+          <button type="button" class="btn btn-outline" id="btnPreview">Summary</button>
+          <button type="button" class="btn btn-mail" id="btnEmail">Email</button>
+          <button type="button" class="btn btn-primary" id="btnFinish">Finish & Next</button>
         </div>
       </div>
     </div>
@@ -373,11 +320,11 @@
   <div class="modal">
     <div class="modal-header">
       <strong>Clean Feedback Summary</strong>
-      <button type="button" class="btn btn-outline" style="padding:3px 8px;" onclick="closeModal('previewModal')">Close</button>
+      <button type="button" class="btn btn-outline" id="btnClosePreview" style="padding:3px 8px;">Close</button>
     </div>
     <pre class="preview-box" id="previewContent"></pre>
     <div class="actions-bar" style="justify-content: flex-end;">
-      <button type="button" class="btn btn-primary" onclick="copyPreview()">Copy to Clipboard</button>
+      <button type="button" class="btn btn-primary" id="btnCopyPreview">Copy to Clipboard</button>
     </div>
   </div>
 </div>
@@ -386,19 +333,18 @@
   <div class="modal">
     <div class="modal-header">
       <strong>Recent Evaluations (Tap to Edit)</strong>
-      <button type="button" class="btn btn-outline" style="padding:3px 8px;" onclick="closeModal('historyModal')">Close</button>
+      <button type="button" class="btn btn-outline" id="btnCloseHistory" style="padding:3px 8px;">Close</button>
     </div>
     <div id="historyList">Loading...</div>
   </div>
 </div>
 
 <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxgW1EDLjQjsVttWWLNA_yI5pMVuRU69CMBdgi840QYYoK6XzbRIe2UimfY7RHIo-zc/exec';
-
-  var RUBRIC_KEYS = ['pronunciation', 'intonation', 'fluency', 'grammar', 'vocabulary', 'intelligibility'];
+window.addEventListener('DOMContentLoaded', function() {
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxgW1EDLjQjsVttWWLNA_yI5pMVuRU69CMBdgi840QYYoK6XzbRIe2UimfY7RHIo-zc/exec';
 
   var state = {
-    examId: generateId(),
+    examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
     date: new Date().toLocaleDateString('en-GB'),
     duration: '00:00',
     subject: '',
@@ -419,77 +365,61 @@
   var timerInterval = null;
   var secondsElapsed = 0;
   var isTimerRunning = false;
-
   var mediaRecorder = null;
   var audioChunks = [];
   var audioStream = null;
   var recordedMimeType = 'audio/webm';
+
+  function setStatus(type, text) {
+    document.getElementById('statusDot').className = 'dot ' + type;
+    document.getElementById('statusText').textContent = text;
+  }
+
+  function getNow24() {
+    var d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' +
+           String(d.getMinutes()).padStart(2, '0') + ':' +
+           String(d.getSeconds()).padStart(2, '0');
+  }
 
   function callBackend(payload) {
     return fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
-    }).then(function(res) {
-      return res.json();
-    });
-  }
-
-  function generateId() {
-    return 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-  }
-
-  function getNow24() {
-    var d = new Date();
-    var hh = String(d.getHours()).padStart(2, '0');
-    var mm = String(d.getMinutes()).padStart(2, '0');
-    var ss = String(d.getSeconds()).padStart(2, '0');
-    return hh + ':' + mm + ':' + ss;
-  }
-
-  function selectRubric(key, val) {
-    if (!state.rubric) state.rubric = {};
-    state.rubric[key] = (state.rubric[key] === val) ? '' : val;
-    updateRubricUI();
-    triggerSave();
+    }).then(function(res) { return res.json(); });
   }
 
   function updateRubricUI() {
-    if (!state.rubric) state.rubric = {};
-    for (var i = 0; i < RUBRIC_KEYS.length; i++) {
-      var key = RUBRIC_KEYS[i];
-      var group = document.getElementById('scale-' + key);
-      if (!group) continue;
-      var btns = group.children;
-      for (var j = 0; j < btns.length; j++) {
-        btns[j].classList.toggle('active', btns[j].dataset.val === state.rubric[key]);
-      }
-    }
+    document.querySelectorAll('.scale-group').forEach(function(group) {
+      var crit = group.getAttribute('data-criterion');
+      group.querySelectorAll('.scale-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-val') === state.rubric[crit]);
+      });
+    });
   }
 
-  function appendTag(tag) {
-    var ta = document.getElementById('notes');
-    var current = ta.value;
-    var timestamp = getNow24();
-    var prefix = (current.length > 0 && current.slice(-1) !== '\n') ? '\n' : '';
-    ta.value = current + prefix + tag + ' [' + timestamp + ']\n';
-    ta.focus();
-    ta.selectionStart = ta.selectionEnd = ta.value.length;
-    ta.scrollTop = ta.scrollHeight;
-    handleInput();
+  function populateForm() {
+    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
+      document.getElementById(id).value = state[id] || '';
+    });
+    updateRubricUI();
+    var box = document.getElementById('audioLinkBox');
+    box.innerHTML = state.audioUrl ? '<a href="' + state.audioUrl + '" target="_blank">Open Drive Audio ↗</a>' : '';
   }
 
-  function handleInput() {
-    state.subject = document.getElementById('subject').value;
-    state.course = document.getElementById('course').value;
-    state.instance = document.getElementById('instance').value;
-    state.studentName = document.getElementById('studentName').value;
-    state.dni = document.getElementById('dni').value;
-    state.email = document.getElementById('email').value;
-    state.notes = document.getElementById('notes').value;
-    state.aiSummary = document.getElementById('aiSummary').value;
-    state.finalGrade = document.getElementById('finalGrade').value;
-    triggerSave();
+  function syncToCloud(callback) {
+    if (!navigator.onLine) { setStatus('offline', 'Offline (Local)'); return; }
+    callBackend({ action: 'upsert', data: state })
+      .then(function(res) {
+        if (res && res.success) {
+          setStatus('saved', 'Saved ' + res.timestamp);
+          if (callback) callback();
+        } else {
+          setStatus('offline', 'Sync error');
+        }
+      })
+      .catch(function() { setStatus('offline', 'Sync failed (Check API URL)'); });
   }
 
   function triggerSave() {
@@ -499,89 +429,54 @@
         subject: state.subject, course: state.course, instance: state.instance
       }));
     } catch (e) {}
-
     setStatus('saving', 'Saving...');
     clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(syncToCloud, 2000);
+    syncTimeout = setTimeout(syncToCloud, 1500);
   }
 
-  function syncToCloud(callback) {
-    if (!navigator.onLine) {
-      setStatus('offline', 'Offline (Local)');
-      return;
-    }
-
-    callBackend({ action: 'upsert', data: state })
-      .then(function(res) {
-        if (res && res.success) {
-          setStatus('saved', 'Saved ' + res.timestamp);
-          if (callback) callback();
-        } else {
-          setStatus('offline', 'Sync error (Local)');
-        }
-      })
-      .catch(function() {
-        setStatus('offline', 'Offline (Local)');
-      });
+  function handleInput() {
+    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
+      state[id] = document.getElementById(id).value;
+    });
+    triggerSave();
   }
 
-  function setStatus(type, text) {
-    var dot = document.getElementById('statusDot');
-    dot.className = 'dot ' + type;
-    document.getElementById('statusText').textContent = text;
-  }
+  // Bind Inputs
+  ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', handleInput);
+  });
 
-  function loadFromLocal() {
-    try {
-      var saved = localStorage.getItem('oral_exam_current');
-      var session = localStorage.getItem('oral_exam_session');
-      if (saved) {
-        var parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
-          state = Object.assign(state, parsed);
-          if (!state.rubric) state.rubric = {};
-        }
-      } else if (session) {
-        var s = JSON.parse(session);
-        state.subject = s.subject || '';
-        state.course = s.course || '';
-        state.instance = s.instance || '';
-      }
-    } catch (e) {
-      localStorage.removeItem('oral_exam_current');
-    }
-    populateForm();
-  }
+  // Bind Rubric Buttons
+  document.querySelectorAll('.scale-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var crit = btn.parentElement.getAttribute('data-criterion');
+      var val = btn.getAttribute('data-val');
+      state.rubric[crit] = (state.rubric[crit] === val) ? '' : val;
+      updateRubricUI();
+      triggerSave();
+    });
+  });
 
-  function populateForm() {
-    document.getElementById('subject').value = state.subject || '';
-    document.getElementById('course').value = state.course || '';
-    document.getElementById('instance').value = state.instance || '';
-    document.getElementById('studentName').value = state.studentName || '';
-    document.getElementById('dni').value = state.dni || '';
-    document.getElementById('email').value = state.email || '';
-    document.getElementById('notes').value = state.notes || '';
-    document.getElementById('aiSummary').value = state.aiSummary || '';
-    document.getElementById('finalGrade').value = state.finalGrade || '';
-    updateRubricUI();
-    updateAudioLinkUI();
-  }
+  // Bind Quick Tags
+  document.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var tag = chip.getAttribute('data-tag');
+      var ta = document.getElementById('notes');
+      var prefix = (ta.value.length > 0 && ta.value.slice(-1) !== '\n') ? '\n' : '';
+      ta.value = ta.value + prefix + tag + ' [' + getNow24() + ']\n';
+      ta.focus();
+      ta.selectionStart = ta.selectionEnd = ta.value.length;
+      ta.scrollTop = ta.scrollHeight;
+      handleInput();
+    });
+  });
 
-  function updateAudioLinkUI() {
-    var box = document.getElementById('audioLinkBox');
-    if (state.audioUrl) {
-      box.innerHTML = '<a href="' + state.audioUrl + '" target="_blank">Open Drive Audio ↗</a>';
-    } else {
-      box.innerHTML = '';
-    }
-  }
-
+  // Audio & Timer
   function startOrResumeAudio() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       document.getElementById('audioStatus').textContent = 'Audio: Mic not supported';
       return;
     }
-
     if (!mediaRecorder) {
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(function(stream) {
@@ -590,25 +485,25 @@
           mediaRecorder = new MediaRecorder(audioStream, options);
           recordedMimeType = mediaRecorder.mimeType || 'audio/webm';
           audioChunks = [];
-
-          mediaRecorder.ondataavailable = function(e) {
-            if (e.data && e.data.size > 0) audioChunks.push(e.data);
-          };
+          mediaRecorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
           mediaRecorder.start(1000);
           document.getElementById('recBadge').style.display = 'inline-flex';
-          document.getElementById('audioStatus').textContent = 'Audio: Recording in progress...';
+          document.getElementById('audioStatus').textContent = 'Audio: Recording...';
         })
         .catch(function(err) {
-          document.getElementById('audioStatus').textContent = 'Audio: Mic permission denied (' + err.name + ')';
+          document.getElementById('audioStatus').textContent = 'Audio blocked: ' + err.name;
         });
     } else if (mediaRecorder.state === 'paused') {
       mediaRecorder.resume();
       document.getElementById('recBadge').style.display = 'inline-flex';
-      document.getElementById('audioStatus').textContent = 'Audio: Recording in progress...';
+      document.getElementById('audioStatus').textContent = 'Audio: Recording...';
     }
   }
 
-  function pauseAudio() {
+  function stopTimer() {
+    isTimerRunning = false;
+    document.getElementById('btnStart').textContent = 'Start';
+    clearInterval(timerInterval);
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.pause();
       document.getElementById('recBadge').style.display = 'none';
@@ -630,95 +525,36 @@
     document.getElementById('audioStatus').textContent = 'Audio: Ready (starts with timer)';
   }
 
-  function finalizeAndUploadAudio(doneCallback) {
-    if (!mediaRecorder || audioChunks.length === 0) {
-      discardAudio();
-      doneCallback(null);
-      return;
-    }
-
-    document.getElementById('audioStatus').textContent = 'Audio: Uploading to Google Drive...';
-    mediaRecorder.onstop = function() {
-      var blob = new Blob(audioChunks, { type: recordedMimeType });
-      var reader = new FileReader();
-      reader.onloadend = function() {
-        var base64Data = reader.result.split(',')[1];
-        var safeName = (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_');
-        var safeDni = (state.dni || 'NoID').replace(/[^a-zA-Z0-9_-]/g, '_');
-        var fileName = state.date.replace(/\//g, '-') + '_' + safeName + '_' + safeDni + '_' + state.examId + '.webm';
-
-        callBackend({
-          action: 'audio',
-          base64Data: base64Data,
-          mimeType: recordedMimeType,
-          fileName: fileName
-        })
-        .then(function(res) {
-          discardAudio();
-          if (res && res.success) {
-            document.getElementById('audioStatus').textContent = 'Audio: Saved in Drive';
-            doneCallback(res.url);
-          } else {
-            document.getElementById('audioStatus').textContent = 'Audio upload failed';
-            doneCallback(null);
-          }
-        })
-        .catch(function() {
-          discardAudio();
-          document.getElementById('audioStatus').textContent = 'Audio upload error';
-          doneCallback(null);
-        });
-      };
-      reader.readAsDataURL(blob);
-    };
-
-    if (mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-    }
-  }
-
-  function toggleTimer() {
-    if (isTimerRunning) {
-      stopTimer();
-    } else {
-      isTimerRunning = true;
-      document.getElementById('timerToggleBtn').textContent = 'Pause';
-      startOrResumeAudio();
-      timerInterval = setInterval(function() {
-        secondsElapsed++;
-        updateTimerDisplay();
-      }, 1000);
-    }
-  }
-
-  function stopTimer() {
-    isTimerRunning = false;
-    document.getElementById('timerToggleBtn').textContent = 'Start';
-    clearInterval(timerInterval);
-    pauseAudio();
-  }
-
-  function resetTimer() {
-    stopTimer();
-    secondsElapsed = 0;
-    updateTimerDisplay();
-    discardAudio();
-  }
-
   function updateTimerDisplay() {
-    var mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-    var secs = String(secondsElapsed % 60)).padStart(2, '0');
-    var formatted = mins + ':' + secs;
+    var formatted = String(Math.floor(secondsElapsed / 60)).padStart(2, '0') + ':' + String(secondsElapsed % 60).padStart(2, '0');
     document.getElementById('timerDisplay').textContent = formatted;
     state.duration = formatted;
   }
 
-  function requestAiSummary() {
-    var btn = document.getElementById('aiBtn');
+  document.getElementById('btnStart').addEventListener('click', function() {
+    if (isTimerRunning) {
+      stopTimer();
+    } else {
+      isTimerRunning = true;
+      document.getElementById('btnStart').textContent = 'Pause';
+      startOrResumeAudio();
+      timerInterval = setInterval(function() { secondsElapsed++; updateTimerDisplay(); }, 1000);
+    }
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function() {
+    stopTimer();
+    secondsElapsed = 0;
+    updateTimerDisplay();
+    discardAudio();
+  });
+
+  // AI Summary
+  document.getElementById('btnAi').addEventListener('click', function() {
+    var btn = this;
     btn.disabled = true;
     btn.textContent = 'Generating...';
-    setStatus('saving', 'Generating AI summary...');
-
+    setStatus('saving', 'Calling Gemini...');
     callBackend({ action: 'ai', data: state })
       .then(function(res) {
         btn.disabled = false;
@@ -727,7 +563,7 @@
           document.getElementById('aiSummary').value = res.summary;
           handleInput();
         } else {
-          alert('AI Error: ' + (res ? res.error : 'Unknown error'));
+          alert('AI Error: ' + (res ? res.error : 'Unknown'));
           setStatus('saved', 'Ready');
         }
       })
@@ -736,144 +572,129 @@
         btn.textContent = 'Generate AI Summary';
         alert('Connection error: ' + err);
       });
-  }
+  });
 
-  function finishAndNext() {
-    if (!confirm('Mark this exam as Completed, save audio to Drive, and start a new evaluation?')) return;
-    
-    isTimerRunning = false;
-    document.getElementById('timerToggleBtn').textContent = 'Start';
-    clearInterval(timerInterval);
-    
+  // Finish & Next
+  document.getElementById('btnFinish').addEventListener('click', function() {
+    if (!confirm('Complete exam, upload audio to Drive, and start next?')) return;
+    stopTimer();
     state.status = 'Completed';
-    setStatus('saving', 'Saving audio & data...');
+    setStatus('saving', 'Finalizing...');
 
-    finalizeAndUploadAudio(function(uploadedUrl) {
-      if (uploadedUrl) {
-        state.audioUrl = uploadedUrl;
-      }
-
+    function completeReset(url) {
+      if (url) state.audioUrl = url;
       syncToCloud(function() {
-        var keepSubject = state.subject;
-        var keepCourse = state.course;
-        var keepInstance = state.instance;
-
         state = {
-          examId: generateId(),
+          examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
           date: new Date().toLocaleDateString('en-GB'),
           duration: '00:00',
-          subject: keepSubject,
-          course: keepCourse,
-          instance: keepInstance,
-          studentName: '',
-          dni: '',
-          email: '',
-          rubric: {},
-          notes: '',
-          aiSummary: '',
-          audioUrl: '',
-          finalGrade: '',
+          subject: state.subject,
+          course: state.course,
+          instance: state.instance,
+          studentName: '', dni: '', email: '', rubric: {}, notes: '', aiSummary: '', audioUrl: '', finalGrade: '',
           status: 'In Progress'
         };
         secondsElapsed = 0;
         updateTimerDisplay();
-        try { localStorage.setItem('oral_exam_current', JSON.stringify(state)); } catch (e) {}
+        localStorage.setItem('oral_exam_current', JSON.stringify(state));
         populateForm();
         setStatus('saved', 'Ready');
       });
-    });
-  }
+    }
 
+    if (!mediaRecorder || audioChunks.length === 0) {
+      discardAudio();
+      completeReset(null);
+    } else {
+      document.getElementById('audioStatus').textContent = 'Audio: Uploading to Drive...';
+      mediaRecorder.onstop = function() {
+        var blob = new Blob(audioChunks, { type: recordedMimeType });
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          var base64Data = reader.result.split(',')[1];
+          var fileName = state.date.replace(/\//g, '-') + '_' + (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + state.examId + '.webm';
+          callBackend({ action: 'audio', base64Data: base64Data, mimeType: recordedMimeType, fileName: fileName })
+            .then(function(res) { discardAudio(); completeReset(res && res.success ? res.url : null); })
+            .catch(function() { discardAudio(); completeReset(null); });
+        };
+        reader.readAsDataURL(blob);
+      };
+      if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    }
+  });
+
+  // Preview, Email & History
   function buildSummaryText() {
     var r = state.rubric || {};
-    var text = 'ORAL EXAM FEEDBACK\n' +
-      'Student: ' + (state.studentName || '-') + ' (ID: ' + (state.dni || '-') + ')\n' +
+    return 'ORAL EXAM FEEDBACK\nStudent: ' + (state.studentName || '-') + ' (ID: ' + (state.dni || '-') + ')\n' +
       'Subject: ' + (state.subject || '-') + ' | Course: ' + (state.course || '-') + ' | Instance: ' + (state.instance || '-') + '\n' +
-      'Date: ' + state.date + ' | Duration: ' + state.duration + '\n\n' +
-      'RUBRIC ASSESSMENT:\n' +
-      '• Pronunciation: ' + (r.pronunciation || '-') + '\n' +
-      '• Intonation: ' + (r.intonation || '-') + '\n' +
-      '• Fluency & Rhythm: ' + (r.fluency || '-') + '\n' +
-      '• Grammar: ' + (r.grammar || '-') + '\n' +
-      '• Vocabulary: ' + (r.vocabulary || '-') + '\n' +
-      '• Intelligibility: ' + (r.intelligibility || '-') + '\n\n' +
-      'FINAL GRADE: ' + (state.finalGrade || 'Pending') + '\n\n';
-    
-    if (state.aiSummary) {
-      text += 'FEEDBACK SUMMARY:\n' + state.aiSummary + '\n\n';
-    }
-    text += 'EXAMINER\'S NOTES:\n' + (state.notes || 'None');
-    return text;
+      'Date: ' + state.date + ' | Duration: ' + state.duration + '\n\nRUBRIC:\n' +
+      '• Pronunciation: ' + (r.pronunciation || '-') + '\n• Intonation: ' + (r.intonation || '-') + '\n' +
+      '• Fluency & Rhythm: ' + (r.fluency || '-') + '\n• Grammar: ' + (r.grammar || '-') + '\n' +
+      '• Vocabulary: ' + (r.vocabulary || '-') + '\n• Intelligibility: ' + (r.intelligibility || '-') + '\n\n' +
+      'FINAL GRADE: ' + (state.finalGrade || 'Pending') + '\n\n' +
+      (state.aiSummary ? 'FEEDBACK SUMMARY:\n' + state.aiSummary + '\n\n' : '') +
+      'NOTES:\n' + (state.notes || 'None');
   }
 
-  function openPreview() {
+  document.getElementById('btnPreview').addEventListener('click', function() {
     document.getElementById('previewContent').textContent = buildSummaryText();
     document.getElementById('previewModal').style.display = 'flex';
-  }
-
-  function copyPreview() {
+  });
+  document.getElementById('btnClosePreview').addEventListener('click', function() {
+    document.getElementById('previewModal').style.display = 'none';
+  });
+  document.getElementById('btnCopyPreview').addEventListener('click', function() {
     navigator.clipboard.writeText(buildSummaryText());
-    alert('Feedback copied to clipboard!');
-  }
+    alert('Copied!');
+  });
+  document.getElementById('btnEmail').addEventListener('click', function() {
+    if (!state.email) { alert('Enter student email first.'); return; }
+    if (!confirm('Send feedback to ' + state.email + '?')) return;
+    setStatus('saving', 'Sending email...');
+    callBackend({ action: 'email', data: state }).then(function(res) {
+      if (res && res.success) { alert('Email sent!'); setStatus('saved', 'Email sent'); }
+      else { alert('Error: ' + (res ? res.error : 'Failed')); }
+    });
+  });
 
-  function sendEmail() {
-    if (!state.email) {
-      alert('Please enter the student email address first.');
-      return;
-    }
-    if (!confirm('Send feedback email to ' + state.email + '?')) return;
-    
-    setStatus('saving', 'Sending...');
-    callBackend({ action: 'email', data: state })
-      .then(function(res) {
-        if (res.success) {
-          alert('Feedback email sent successfully!');
-          setStatus('saved', 'Email sent');
-        } else {
-          alert('Error sending email: ' + res.error);
-        }
-      });
-  }
-
-  function openHistory() {
+  document.getElementById('btnHistory').addEventListener('click', function() {
     document.getElementById('historyModal').style.display = 'flex';
     var list = document.getElementById('historyList');
-    list.innerHTML = 'Loading recent exams...';
-
-    callBackend({ action: 'history' })
-      .then(function(res) {
-        var exams = res.exams || [];
-        if (exams.length === 0) {
-          list.innerHTML = '<p>No evaluations recorded yet.</p>';
-          return;
-        }
-        list.innerHTML = '';
-        exams.forEach(function(ex) {
-          var item = document.createElement('div');
-          item.className = 'history-item';
-          item.innerHTML = '<div><strong>' + (ex.studentName || 'Unnamed Student') + '</strong> (' + (ex.dni || 'No ID') + ')<br>' +
-            '<small>' + (ex.subject || '') + ' • ' + (ex.instance || '') + ' • Grade: <b>' + (ex.finalGrade || '-') + '</b></small></div>' +
-            '<span style="font-size:0.75rem; color:#64748b;">' + ex.status + '</span>';
-          item.onclick = function() {
-            state = ex;
-            populateForm();
-            try { localStorage.setItem('oral_exam_current', JSON.stringify(state)); } catch (e) {}
-            closeModal('historyModal');
-            setStatus('saved', 'Loaded from history');
-          };
-          list.appendChild(item);
+    list.innerHTML = 'Loading...';
+    callBackend({ action: 'history' }).then(function(res) {
+      var exams = (res && res.exams) ? res.exams : [];
+      if (!exams.length) { list.innerHTML = '<p>No evaluations yet.</p>'; return; }
+      list.innerHTML = '';
+      exams.forEach(function(ex) {
+        var item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = '<div><strong>' + (ex.studentName || 'Unnamed') + '</strong> (' + (ex.dni || 'No ID') + ')<br>' +
+          '<small>' + (ex.subject || '') + ' • Grade: <b>' + (ex.finalGrade || '-') + '</b></small></div>' +
+          '<span style="font-size:0.75rem; color:#64748b;">' + ex.status + '</span>';
+        item.addEventListener('click', function() {
+          state = ex;
+          populateForm();
+          localStorage.setItem('oral_exam_current', JSON.stringify(state));
+          document.getElementById('historyModal').style.display = 'none';
+          setStatus('saved', 'Loaded');
         });
+        list.appendChild(item);
       });
-  }
+    });
+  });
+  document.getElementById('btnCloseHistory').addEventListener('click', function() {
+    document.getElementById('historyModal').style.display = 'none';
+  });
 
-  function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-  }
-
-  window.addEventListener('online', function() { syncToCloud(); });
-  window.addEventListener('offline', function() { setStatus('offline', 'Offline (Local)'); });
-
-  loadFromLocal();
+  // Init
+  try {
+    var saved = localStorage.getItem('oral_exam_current');
+    if (saved) state = Object.assign(state, JSON.parse(saved));
+  } catch (e) {}
+  populateForm();
+  setStatus('saved', 'Ready');
+});
 </script>
 </body>
 </html>
