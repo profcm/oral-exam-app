@@ -297,4 +297,433 @@
       <div class="bottom-controls">
         <div class="field grade-box">
           <label>Final Grade</label>
-          <input
+          <input type="text" id="finalGrade" placeholder="e.g., 8 / Pass">
+        </div>
+        <div class="actions-bar">
+          <button type="button" class="btn btn-outline" id="btnPreview">Summary</button>
+          <button type="button" class="btn btn-mail" id="btnEmail">Email</button>
+          <button type="button" class="btn btn-primary" id="btnFinish">Finish & Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <strong>Clean Feedback Summary</strong>
+      <button type="button" class="btn btn-outline" id="btnClosePreview" style="padding:3px 8px;">Close</button>
+    </div>
+    <pre class="preview-box" id="previewContent"></pre>
+    <div class="actions-bar" style="justify-content: flex-end;">
+      <button type="button" class="btn btn-primary" id="btnCopyPreview">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="historyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <strong>Recent Evaluations (Tap to Edit)</strong>
+      <button type="button" class="btn btn-outline" id="btnCloseHistory" style="padding:3px 8px;">Close</button>
+    </div>
+    <div id="historyList">Loading...</div>
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxgW1EDLjQjsVttWWLNA_yI5pMVuRU69CMBdgi840QYYoK6XzbRIe2UimfY7RHIo-zc/exec';
+
+  var state = {
+    examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+    date: new Date().toLocaleDateString('en-GB'),
+    duration: '00:00',
+    subject: '',
+    course: '',
+    instance: '',
+    studentName: '',
+    dni: '',
+    email: '',
+    rubric: {},
+    notes: '',
+    aiSummary: '',
+    audioUrl: '',
+    finalGrade: '',
+    status: 'In Progress'
+  };
+
+  var syncTimeout = null;
+  var timerInterval = null;
+  var secondsElapsed = 0;
+  var activeMode = null;
+
+  var mediaRecorder = null;
+  var audioChunks = [];
+  var audioStream = null;
+  var recordedMimeType = 'audio/webm';
+
+  function setStatus(type, text) {
+    document.getElementById('statusDot').className = 'dot ' + type;
+    document.getElementById('statusText').textContent = text;
+  }
+
+  function getNow24() {
+    var d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' +
+           String(d.getMinutes()).padStart(2, '0') + ':' +
+           String(d.getSeconds()).padStart(2, '0');
+  }
+
+  function callBackend(payload) {
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function(res) { return res.json(); });
+  }
+
+  function updateRubricUI() {
+    document.querySelectorAll('.scale-group').forEach(function(group) {
+      var crit = group.getAttribute('data-criterion');
+      group.querySelectorAll('.scale-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-val') === state.rubric[crit]);
+      });
+    });
+  }
+
+  function populateForm() {
+    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
+      document.getElementById(id).value = state[id] || '';
+    });
+    updateRubricUI();
+  }
+
+  function syncToCloud(callback) {
+    if (!navigator.onLine) { setStatus('offline', 'Offline (Local)'); return; }
+    callBackend({ action: 'upsert', data: state })
+      .then(function(res) {
+        if (res && res.success) {
+          setStatus('saved', 'Saved ' + res.timestamp);
+          if (callback) callback();
+        } else {
+          setStatus('offline', 'Sync error');
+        }
+      })
+      .catch(function() { setStatus('offline', 'Sync failed'); });
+  }
+
+  function triggerSave() {
+    try {
+      localStorage.setItem('oral_exam_current', JSON.stringify(state));
+      localStorage.setItem('oral_exam_session', JSON.stringify({
+        subject: state.subject, course: state.course, instance: state.instance
+      }));
+    } catch (e) {}
+    setStatus('saving', 'Saving...');
+    clearTimeout(syncTimeout);
+    syncTimeout = setTimeout(syncToCloud, 1500);
+  }
+
+  function handleInput() {
+    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
+      state[id] = document.getElementById(id).value;
+    });
+    triggerSave();
+  }
+
+  ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', handleInput);
+  });
+
+  document.querySelectorAll('.scale-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var crit = btn.parentElement.getAttribute('data-criterion');
+      var val = btn.getAttribute('data-val');
+      state.rubric[crit] = (state.rubric[crit] === val) ? '' : val;
+      updateRubricUI();
+      triggerSave();
+    });
+  });
+
+  document.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var tag = chip.getAttribute('data-tag');
+      var ta = document.getElementById('notes');
+      var prefix = (ta.value.length > 0 && ta.value.slice(-1) !== '\n') ? '\n' : '';
+      ta.value = ta.value + prefix + tag + ' [' + getNow24() + ']\n';
+      ta.focus();
+      ta.selectionStart = ta.selectionEnd = ta.value.length;
+      ta.scrollTop = ta.scrollHeight;
+      handleInput();
+    });
+  });
+
+  function startOrResumeAudio() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Microphone is not supported in this browser.');
+      return;
+    }
+    if (!mediaRecorder) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+          audioStream = stream;
+          var options = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm')) ? { mimeType: 'audio/webm' } : {};
+          mediaRecorder = new MediaRecorder(audioStream, options);
+          recordedMimeType = mediaRecorder.mimeType || 'audio/webm';
+          audioChunks = [];
+          mediaRecorder.ondataavailable = function(e) {
+            if (e.data && e.data.size > 0) audioChunks.push(e.data);
+          };
+          mediaRecorder.start(1000);
+          document.getElementById('btnStartRec').classList.add('recording-active');
+        })
+        .catch(function(err) {
+          alert('Microphone permission denied: ' + err.name);
+        });
+    } else if (mediaRecorder.state === 'paused') {
+      mediaRecorder.resume();
+      document.getElementById('btnStartRec').classList.add('recording-active');
+    }
+  }
+
+  function pauseAudio() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.pause();
+    }
+    document.getElementById('btnStartRec').classList.remove('recording-active');
+  }
+
+  function discardAudio() {
+    if (mediaRecorder) {
+      if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      mediaRecorder = null;
+    }
+    if (audioStream) {
+      audioStream.getTracks().forEach(function(t) { t.stop(); });
+      audioStream = null;
+    }
+    audioChunks = [];
+    document.getElementById('btnStartRec').classList.remove('recording-active');
+  }
+
+  function downloadAudioLocally(doneCallback) {
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+      discardAudio();
+      doneCallback(null);
+      return;
+    }
+
+    mediaRecorder.onstop = function() {
+      if (!audioChunks || audioChunks.length === 0) {
+        discardAudio();
+        doneCallback(null);
+        return;
+      }
+
+      var blob = new Blob(audioChunks, { type: recordedMimeType });
+      var safeName = (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_');
+      var safeDni = (state.dni || 'NoID').replace(/[^a-zA-Z0-9_-]/g, '_');
+      var fileName = state.date.replace(/\//g, '-') + '_' + safeName + '_' + safeDni + '_' + state.examId + '.webm';
+
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        discardAudio();
+        doneCallback('Local file: ' + fileName);
+      }, 400);
+    };
+
+    try { mediaRecorder.requestData(); } catch (e) {}
+    mediaRecorder.stop();
+  }
+
+  function startInterval() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+      secondsElapsed++;
+      updateTimerDisplay();
+    }, 1000);
+  }
+
+  function pauseAll() {
+    activeMode = null;
+    clearInterval(timerInterval);
+    document.getElementById('btnStartTimer').textContent = 'Start';
+    document.getElementById('btnStartRec').textContent = 'Start';
+    pauseAudio();
+  }
+
+  function updateTimerDisplay() {
+    var formatted = String(Math.floor(secondsElapsed / 60)).padStart(2, '0') + ':' + String(secondsElapsed % 60).padStart(2, '0');
+    document.getElementById('timerDisplay').textContent = formatted;
+    state.duration = formatted;
+  }
+
+  document.getElementById('btnStartTimer').addEventListener('click', function() {
+    if (activeMode === 'timer') {
+      pauseAll();
+    } else {
+      pauseAudio();
+      activeMode = 'timer';
+      document.getElementById('btnStartTimer').textContent = 'Pause';
+      document.getElementById('btnStartRec').textContent = 'Start';
+      startInterval();
+    }
+  });
+
+  document.getElementById('btnStartRec').addEventListener('click', function() {
+    if (activeMode === 'rec') {
+      pauseAll();
+    } else {
+      activeMode = 'rec';
+      document.getElementById('btnStartRec').textContent = 'Pause';
+      document.getElementById('btnStartTimer').textContent = 'Start';
+      startOrResumeAudio();
+      startInterval();
+    }
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function() {
+    pauseAll();
+    secondsElapsed = 0;
+    updateTimerDisplay();
+    discardAudio();
+  });
+
+  document.getElementById('btnAi').addEventListener('click', function() {
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    setStatus('saving', 'Calling Gemini...');
+    callBackend({ action: 'ai', data: state })
+      .then(function(res) {
+        btn.disabled = false;
+        btn.textContent = 'Generate AI Summary';
+        if (res && res.success) {
+          document.getElementById('aiSummary').value = res.summary;
+          handleInput();
+        } else {
+          alert('AI Error: ' + (res ? res.error : 'Unknown'));
+          setStatus('saved', 'Ready');
+        }
+      })
+      .catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Generate AI Summary';
+        alert('Connection error: ' + err);
+      });
+  });
+
+  document.getElementById('btnFinish').addEventListener('click', function() {
+    if (!confirm('Complete exam and start next?')) return;
+    pauseAll();
+    state.status = 'Completed';
+    setStatus('saving', 'Finalizing...');
+
+    downloadAudioLocally(function(localFileLabel) {
+      if (localFileLabel) {
+        state.audioUrl = localFileLabel;
+      }
+      syncToCloud(function() {
+        state = {
+          examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+          date: new Date().toLocaleDateString('en-GB'),
+          duration: '00:00',
+          subject: state.subject,
+          course: state.course,
+          instance: state.instance,
+          studentName: '', dni: '', email: '', rubric: {}, notes: '', aiSummary: '', audioUrl: '', finalGrade: '',
+          status: 'In Progress'
+        };
+        secondsElapsed = 0;
+        updateTimerDisplay();
+        localStorage.setItem('oral_exam_current', JSON.stringify(state));
+        populateForm();
+        setStatus('saved', 'Ready');
+      });
+    });
+  });
+
+  function buildSummaryText() {
+    var r = state.rubric || {};
+    return 'ORAL EXAM FEEDBACK\nStudent: ' + (state.studentName || '-') + ' (ID: ' + (state.dni || '-') + ')\n' +
+      'Subject: ' + (state.subject || '-') + ' | Course: ' + (state.course || '-') + ' | Instance: ' + (state.instance || '-') + '\n' +
+      'Date: ' + state.date + ' | Duration: ' + state.duration + '\n\nRUBRIC:\n' +
+      '• Pronunciation: ' + (r.pronunciation || '-') + '\n• Intonation: ' + (r.intonation || '-') + '\n' +
+      '• Fluency & Rhythm: ' + (r.fluency || '-') + '\n• Grammar: ' + (r.grammar || '-') + '\n' +
+      '• Vocabulary: ' + (r.vocabulary || '-') + '\n• Intelligibility: ' + (r.intelligibility || '-') + '\n\n' +
+      'FINAL GRADE: ' + (state.finalGrade || 'Pending') + '\n\n' +
+      (state.aiSummary ? 'FEEDBACK SUMMARY:\n' + state.aiSummary + '\n\n' : '') +
+      'NOTES:\n' + (state.notes || 'None');
+  }
+
+  document.getElementById('btnPreview').addEventListener('click', function() {
+    document.getElementById('previewContent').textContent = buildSummaryText();
+    document.getElementById('previewModal').style.display = 'flex';
+  });
+  document.getElementById('btnClosePreview').addEventListener('click', function() {
+    document.getElementById('previewModal').style.display = 'none';
+  });
+  document.getElementById('btnCopyPreview').addEventListener('click', function() {
+    navigator.clipboard.writeText(buildSummaryText());
+    alert('Copied!');
+  });
+  document.getElementById('btnEmail').addEventListener('click', function() {
+    if (!state.email) { alert('Enter student email first.'); return; }
+    if (!confirm('Send feedback to ' + state.email + '?')) return;
+    setStatus('saving', 'Sending email...');
+    callBackend({ action: 'email', data: state }).then(function(res) {
+      if (res && res.success) { alert('Email sent!'); setStatus('saved', 'Email sent'); }
+      else { alert('Error: ' + (res ? res.error : 'Failed')); }
+    });
+  });
+
+  document.getElementById('btnHistory').addEventListener('click', function() {
+    document.getElementById('historyModal').style.display = 'flex';
+    var list = document.getElementById('historyList');
+    list.innerHTML = 'Loading...';
+    callBackend({ action: 'history' }).then(function(res) {
+      var exams = (res && res.exams) ? res.exams : [];
+      if (!exams.length) { list.innerHTML = '<p>No evaluations yet.</p>'; return; }
+      list.innerHTML = '';
+      exams.forEach(function(ex) {
+        var item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = '<div><strong>' + (ex.studentName || 'Unnamed') + '</strong> (' + (ex.dni || 'No ID') + ')<br>' +
+          '<small>' + (ex.subject || '') + ' • Grade: <b>' + (ex.finalGrade || '-') + '</b></small></div>' +
+          '<span style="font-size:0.75rem; color:#64748b;">' + ex.status + '</span>';
+        item.addEventListener('click', function() {
+          state = ex;
+          populateForm();
+          localStorage.setItem('oral_exam_current', JSON.stringify(state));
+          document.getElementById('historyModal').style.display = 'none';
+          setStatus('saved', 'Loaded');
+        });
+        list.appendChild(item);
+      });
+    });
+  });
+  document.getElementById('btnCloseHistory').addEventListener('click', function() {
+    document.getElementById('historyModal').style.display = 'none';
+  });
+
+  try {
+    var saved = localStorage.getItem('oral_exam_current');
+    if (saved) state = Object.assign(state, JSON.parse(saved));
+  } catch (e) {}
+  populateForm();
+  setStatus('saved', 'Ready');
+});
+</script>
+</body>
+</html>
