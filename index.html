@@ -577,7 +577,10 @@ window.addEventListener('DOMContentLoaded', function() {
   // Finish & Next
   document.getElementById('btnFinish').addEventListener('click', function() {
     if (!confirm('Complete exam, upload audio to Drive, and start next?')) return;
-    stopTimer();
+    
+    isTimerRunning = false;
+    document.getElementById('btnStart').textContent = 'Start';
+    clearInterval(timerInterval);
     state.status = 'Completed';
     setStatus('saving', 'Finalizing...');
 
@@ -602,25 +605,49 @@ window.addEventListener('DOMContentLoaded', function() {
       });
     }
 
-    if (!mediaRecorder || audioChunks.length === 0) {
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') {
       discardAudio();
       completeReset(null);
-    } else {
-      document.getElementById('audioStatus').textContent = 'Audio: Uploading to Drive...';
-      mediaRecorder.onstop = function() {
-        var blob = new Blob(audioChunks, { type: recordedMimeType });
-        var reader = new FileReader();
-        reader.onloadend = function() {
-          var base64Data = reader.result.split(',')[1];
-          var fileName = state.date.replace(/\//g, '-') + '_' + (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + state.examId + '.webm';
-          callBackend({ action: 'audio', base64Data: base64Data, mimeType: recordedMimeType, fileName: fileName })
-            .then(function(res) {   discardAudio();   if (res && res.success) {     completeReset(res.url);   } else {     alert('Error uploading audio to Drive: ' + (res ? res.error : 'Unknown error'));     completeReset(null);   } }) .catch(function(err) {   discardAudio();   alert('Network error uploading audio: ' + err);   completeReset(null); });
-            .catch(function() { discardAudio(); completeReset(null); });
-        };
-        reader.readAsDataURL(blob);
-      };
-      if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      return;
     }
+
+    document.getElementById('audioStatus').textContent = 'Audio: Preparing file...';
+    mediaRecorder.onstop = function() {
+      if (!audioChunks || audioChunks.length === 0) {
+        alert('No audio data was captured by the microphone.');
+        discardAudio();
+        completeReset(null);
+        return;
+      }
+      document.getElementById('audioStatus').textContent = 'Audio: Uploading to Drive...';
+      var blob = new Blob(audioChunks, { type: recordedMimeType });
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        var base64Data = reader.result.split(',')[1];
+        var safeName = (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_');
+        var fileName = state.date.replace(/\//g, '-') + '_' + safeName + '_' + state.examId + '.webm';
+        callBackend({ action: 'audio', base64Data: base64Data, mimeType: recordedMimeType, fileName: fileName })
+          .then(function(res) {
+            discardAudio();
+            if (res && res.success) {
+              alert('Audio saved to Drive!');
+              completeReset(res.url);
+            } else {
+              alert('Drive upload error: ' + (res ? res.error : 'Unknown'));
+              completeReset(null);
+            }
+          })
+          .catch(function(err) {
+            discardAudio();
+            alert('Network error uploading audio: ' + err);
+            completeReset(null);
+          });
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    try { mediaRecorder.requestData(); } catch (e) {}
+    mediaRecorder.stop();
   });
 
   // Preview, Email & History
