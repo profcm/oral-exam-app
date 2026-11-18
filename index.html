@@ -37,20 +37,21 @@
     .header-controls { display: flex; align-items: center; gap: 8px; }
     .timer-box {
       background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 6px;
-      display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums;
+      display: flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums;
     }
-    .rec-badge {
-      display: none; align-items: center; gap: 4px; background: #dc2626;
-      color: white; font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px;
-    }
-    .rec-dot { width: 6px; height: 6px; border-radius: 50%; background: white; animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0.2; } }
     .timer-display { font-weight: 700; font-size: 0.9rem; min-width: 44px; text-align: center; }
     .btn-sm {
-      background: rgba(255,255,255,0.2); border: none; color: white;
+      background: rgba(255,255,255,0.2); border: 1px solid transparent; color: white;
       padding: 3px 7px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600;
     }
     .btn-sm:hover { background: rgba(255,255,255,0.3); }
+    .btn-rec-text { color: #fca5a5; }
+    .btn-rec-text.recording-active {
+      border-color: #f87171;
+      background: rgba(220, 38, 38, 0.25);
+      color: #fecaca;
+    }
+
     .main-grid {
       max-width: 1280px; margin: 8px auto; padding: 0 10px;
       display: grid; grid-template-columns: 1.02fr 1fr; gap: 10px; align-items: start;
@@ -130,10 +131,6 @@
     .btn-outline:hover { background: #f1f5f9; }
     .btn-mail { background: #0f766e; color: white; }
     .btn-mail:hover { background: #115e59; }
-    .audio-status-line {
-      font-size: 0.73rem; color: var(--muted); margin-top: 6px; display: flex; justify-content: space-between;
-    }
-    .audio-status-line a { color: var(--primary); font-weight: 600; text-decoration: none; }
     .modal-backdrop {
       display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55);
       z-index: 200; align-items: center; justify-content: center; padding: 12px;
@@ -162,14 +159,14 @@
     <span>Oral Exam Evaluator</span>
     <div class="status-badge">
       <span id="statusDot" class="dot saved"></span>
-      <span id="statusText">JS Active</span>
+      <span id="statusText">Ready</span>
     </div>
   </div>
   <div class="header-controls">
     <div class="timer-box">
-      <span id="recBadge" class="rec-badge"><span class="rec-dot"></span>REC</span>
       <span id="timerDisplay" class="timer-display">00:00</span>
-      <button type="button" class="btn-sm" id="btnStart">Start</button>
+      <button type="button" class="btn-sm" id="btnStartTimer" title="Timer only">Start</button>
+      <button type="button" class="btn-sm btn-rec-text" id="btnStartRec" title="Timer + Local Audio Recording">Start</button>
       <button type="button" class="btn-sm" id="btnReset">Reset</button>
     </div>
     <button type="button" class="btn-sm" id="btnHistory">History</button>
@@ -251,10 +248,6 @@
           <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
         </div>
       </div>
-      <div class="audio-status-line">
-        <span id="audioStatus">Audio: Ready (starts with timer)</span>
-        <span id="audioLinkBox"></span>
-      </div>
     </div>
   </div>
 
@@ -304,424 +297,4 @@
       <div class="bottom-controls">
         <div class="field grade-box">
           <label>Final Grade</label>
-          <input type="text" id="finalGrade" placeholder="e.g., 8 / Pass">
-        </div>
-        <div class="actions-bar">
-          <button type="button" class="btn btn-outline" id="btnPreview">Summary</button>
-          <button type="button" class="btn btn-mail" id="btnEmail">Email</button>
-          <button type="button" class="btn btn-primary" id="btnFinish">Finish & Next</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="previewModal">
-  <div class="modal">
-    <div class="modal-header">
-      <strong>Clean Feedback Summary</strong>
-      <button type="button" class="btn btn-outline" id="btnClosePreview" style="padding:3px 8px;">Close</button>
-    </div>
-    <pre class="preview-box" id="previewContent"></pre>
-    <div class="actions-bar" style="justify-content: flex-end;">
-      <button type="button" class="btn btn-primary" id="btnCopyPreview">Copy to Clipboard</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="historyModal">
-  <div class="modal">
-    <div class="modal-header">
-      <strong>Recent Evaluations (Tap to Edit)</strong>
-      <button type="button" class="btn btn-outline" id="btnCloseHistory" style="padding:3px 8px;">Close</button>
-    </div>
-    <div id="historyList">Loading...</div>
-  </div>
-</div>
-
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-  var API_URL = 'https://script.google.com/macros/s/AKfycbxgW1EDLjQjsVttWWLNA_yI5pMVuRU69CMBdgi840QYYoK6XzbRIe2UimfY7RHIo-zc/exec';
-
-  var state = {
-    examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-    date: new Date().toLocaleDateString('en-GB'),
-    duration: '00:00',
-    subject: '',
-    course: '',
-    instance: '',
-    studentName: '',
-    dni: '',
-    email: '',
-    rubric: {},
-    notes: '',
-    aiSummary: '',
-    audioUrl: '',
-    finalGrade: '',
-    status: 'In Progress'
-  };
-
-  var syncTimeout = null;
-  var timerInterval = null;
-  var secondsElapsed = 0;
-  var isTimerRunning = false;
-  var mediaRecorder = null;
-  var audioChunks = [];
-  var audioStream = null;
-  var recordedMimeType = 'audio/webm';
-
-  function setStatus(type, text) {
-    document.getElementById('statusDot').className = 'dot ' + type;
-    document.getElementById('statusText').textContent = text;
-  }
-
-  function getNow24() {
-    var d = new Date();
-    return String(d.getHours()).padStart(2, '0') + ':' +
-           String(d.getMinutes()).padStart(2, '0') + ':' +
-           String(d.getSeconds()).padStart(2, '0');
-  }
-
-  function callBackend(payload) {
-    return fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    }).then(function(res) { return res.json(); });
-  }
-
-  function updateRubricUI() {
-    document.querySelectorAll('.scale-group').forEach(function(group) {
-      var crit = group.getAttribute('data-criterion');
-      group.querySelectorAll('.scale-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.getAttribute('data-val') === state.rubric[crit]);
-      });
-    });
-  }
-
-  function populateForm() {
-    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
-      document.getElementById(id).value = state[id] || '';
-    });
-    updateRubricUI();
-    var box = document.getElementById('audioLinkBox');
-    box.innerHTML = state.audioUrl ? '<a href="' + state.audioUrl + '" target="_blank">Open Drive Audio ↗</a>' : '';
-  }
-
-  function syncToCloud(callback) {
-    if (!navigator.onLine) { setStatus('offline', 'Offline (Local)'); return; }
-    callBackend({ action: 'upsert', data: state })
-      .then(function(res) {
-        if (res && res.success) {
-          setStatus('saved', 'Saved ' + res.timestamp);
-          if (callback) callback();
-        } else {
-          setStatus('offline', 'Sync error');
-        }
-      })
-      .catch(function() { setStatus('offline', 'Sync failed (Check API URL)'); });
-  }
-
-  function triggerSave() {
-    try {
-      localStorage.setItem('oral_exam_current', JSON.stringify(state));
-      localStorage.setItem('oral_exam_session', JSON.stringify({
-        subject: state.subject, course: state.course, instance: state.instance
-      }));
-    } catch (e) {}
-    setStatus('saving', 'Saving...');
-    clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(syncToCloud, 1500);
-  }
-
-  function handleInput() {
-    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
-      state[id] = document.getElementById(id).value;
-    });
-    triggerSave();
-  }
-
-  // Bind Inputs
-  ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
-    document.getElementById(id).addEventListener('input', handleInput);
-  });
-
-  // Bind Rubric Buttons
-  document.querySelectorAll('.scale-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var crit = btn.parentElement.getAttribute('data-criterion');
-      var val = btn.getAttribute('data-val');
-      state.rubric[crit] = (state.rubric[crit] === val) ? '' : val;
-      updateRubricUI();
-      triggerSave();
-    });
-  });
-
-  // Bind Quick Tags
-  document.querySelectorAll('.chip').forEach(function(chip) {
-    chip.addEventListener('click', function() {
-      var tag = chip.getAttribute('data-tag');
-      var ta = document.getElementById('notes');
-      var prefix = (ta.value.length > 0 && ta.value.slice(-1) !== '\n') ? '\n' : '';
-      ta.value = ta.value + prefix + tag + ' [' + getNow24() + ']\n';
-      ta.focus();
-      ta.selectionStart = ta.selectionEnd = ta.value.length;
-      ta.scrollTop = ta.scrollHeight;
-      handleInput();
-    });
-  });
-
-  // Audio & Timer
-  function startOrResumeAudio() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      document.getElementById('audioStatus').textContent = 'Audio: Mic not supported';
-      return;
-    }
-    if (!mediaRecorder) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-          audioStream = stream;
-          var options = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm')) ? { mimeType: 'audio/webm' } : {};
-          mediaRecorder = new MediaRecorder(audioStream, options);
-          recordedMimeType = mediaRecorder.mimeType || 'audio/webm';
-          audioChunks = [];
-          mediaRecorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
-          mediaRecorder.start(1000);
-          document.getElementById('recBadge').style.display = 'inline-flex';
-          document.getElementById('audioStatus').textContent = 'Audio: Recording...';
-        })
-        .catch(function(err) {
-          document.getElementById('audioStatus').textContent = 'Audio blocked: ' + err.name;
-        });
-    } else if (mediaRecorder.state === 'paused') {
-      mediaRecorder.resume();
-      document.getElementById('recBadge').style.display = 'inline-flex';
-      document.getElementById('audioStatus').textContent = 'Audio: Recording...';
-    }
-  }
-
-  function stopTimer() {
-    isTimerRunning = false;
-    document.getElementById('btnStart').textContent = 'Start';
-    clearInterval(timerInterval);
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.pause();
-      document.getElementById('recBadge').style.display = 'none';
-      document.getElementById('audioStatus').textContent = 'Audio: Paused';
-    }
-  }
-
-  function discardAudio() {
-    if (mediaRecorder) {
-      if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-      mediaRecorder = null;
-    }
-    if (audioStream) {
-      audioStream.getTracks().forEach(function(t) { t.stop(); });
-      audioStream = null;
-    }
-    audioChunks = [];
-    document.getElementById('recBadge').style.display = 'none';
-    document.getElementById('audioStatus').textContent = 'Audio: Ready (starts with timer)';
-  }
-
-  function updateTimerDisplay() {
-    var formatted = String(Math.floor(secondsElapsed / 60)).padStart(2, '0') + ':' + String(secondsElapsed % 60).padStart(2, '0');
-    document.getElementById('timerDisplay').textContent = formatted;
-    state.duration = formatted;
-  }
-
-  document.getElementById('btnStart').addEventListener('click', function() {
-    if (isTimerRunning) {
-      stopTimer();
-    } else {
-      isTimerRunning = true;
-      document.getElementById('btnStart').textContent = 'Pause';
-      startOrResumeAudio();
-      timerInterval = setInterval(function() { secondsElapsed++; updateTimerDisplay(); }, 1000);
-    }
-  });
-
-  document.getElementById('btnReset').addEventListener('click', function() {
-    stopTimer();
-    secondsElapsed = 0;
-    updateTimerDisplay();
-    discardAudio();
-  });
-
-  // AI Summary
-  document.getElementById('btnAi').addEventListener('click', function() {
-    var btn = this;
-    btn.disabled = true;
-    btn.textContent = 'Generating...';
-    setStatus('saving', 'Calling Gemini...');
-    callBackend({ action: 'ai', data: state })
-      .then(function(res) {
-        btn.disabled = false;
-        btn.textContent = 'Generate AI Summary';
-        if (res && res.success) {
-          document.getElementById('aiSummary').value = res.summary;
-          handleInput();
-        } else {
-          alert('AI Error: ' + (res ? res.error : 'Unknown'));
-          setStatus('saved', 'Ready');
-        }
-      })
-      .catch(function(err) {
-        btn.disabled = false;
-        btn.textContent = 'Generate AI Summary';
-        alert('Connection error: ' + err);
-      });
-  });
-
-  // Finish & Next
-  document.getElementById('btnFinish').addEventListener('click', function() {
-    if (!confirm('Complete exam, upload audio to Drive, and start next?')) return;
-    
-    isTimerRunning = false;
-    document.getElementById('btnStart').textContent = 'Start';
-    clearInterval(timerInterval);
-    state.status = 'Completed';
-    setStatus('saving', 'Finalizing...');
-
-    function completeReset(url) {
-      if (url) state.audioUrl = url;
-      syncToCloud(function() {
-        state = {
-          examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-          date: new Date().toLocaleDateString('en-GB'),
-          duration: '00:00',
-          subject: state.subject,
-          course: state.course,
-          instance: state.instance,
-          studentName: '', dni: '', email: '', rubric: {}, notes: '', aiSummary: '', audioUrl: '', finalGrade: '',
-          status: 'In Progress'
-        };
-        secondsElapsed = 0;
-        updateTimerDisplay();
-        localStorage.setItem('oral_exam_current', JSON.stringify(state));
-        populateForm();
-        setStatus('saved', 'Ready');
-      });
-    }
-
-    if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-      discardAudio();
-      completeReset(null);
-      return;
-    }
-
-    document.getElementById('audioStatus').textContent = 'Audio: Preparing file...';
-    mediaRecorder.onstop = function() {
-      if (!audioChunks || audioChunks.length === 0) {
-        alert('No audio data was captured by the microphone.');
-        discardAudio();
-        completeReset(null);
-        return;
-      }
-      document.getElementById('audioStatus').textContent = 'Audio: Uploading to Drive...';
-      var blob = new Blob(audioChunks, { type: recordedMimeType });
-      var reader = new FileReader();
-      reader.onloadend = function() {
-        var base64Data = reader.result.split(',')[1];
-        var safeName = (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_');
-        var fileName = state.date.replace(/\//g, '-') + '_' + safeName + '_' + state.examId + '.webm';
-        callBackend({ action: 'audio', base64Data: base64Data, mimeType: recordedMimeType, fileName: fileName })
-          .then(function(res) {
-            discardAudio();
-            if (res && res.success) {
-              alert('Audio saved to Drive!');
-              completeReset(res.url);
-            } else {
-              alert('Drive upload error: ' + (res ? res.error : 'Unknown'));
-              completeReset(null);
-            }
-          })
-          .catch(function(err) {
-            discardAudio();
-            alert('Network error uploading audio: ' + err);
-            completeReset(null);
-          });
-      };
-      reader.readAsDataURL(blob);
-    };
-
-    try { mediaRecorder.requestData(); } catch (e) {}
-    mediaRecorder.stop();
-  });
-
-  // Preview, Email & History
-  function buildSummaryText() {
-    var r = state.rubric || {};
-    return 'ORAL EXAM FEEDBACK\nStudent: ' + (state.studentName || '-') + ' (ID: ' + (state.dni || '-') + ')\n' +
-      'Subject: ' + (state.subject || '-') + ' | Course: ' + (state.course || '-') + ' | Instance: ' + (state.instance || '-') + '\n' +
-      'Date: ' + state.date + ' | Duration: ' + state.duration + '\n\nRUBRIC:\n' +
-      '• Pronunciation: ' + (r.pronunciation || '-') + '\n• Intonation: ' + (r.intonation || '-') + '\n' +
-      '• Fluency & Rhythm: ' + (r.fluency || '-') + '\n• Grammar: ' + (r.grammar || '-') + '\n' +
-      '• Vocabulary: ' + (r.vocabulary || '-') + '\n• Intelligibility: ' + (r.intelligibility || '-') + '\n\n' +
-      'FINAL GRADE: ' + (state.finalGrade || 'Pending') + '\n\n' +
-      (state.aiSummary ? 'FEEDBACK SUMMARY:\n' + state.aiSummary + '\n\n' : '') +
-      'NOTES:\n' + (state.notes || 'None');
-  }
-
-  document.getElementById('btnPreview').addEventListener('click', function() {
-    document.getElementById('previewContent').textContent = buildSummaryText();
-    document.getElementById('previewModal').style.display = 'flex';
-  });
-  document.getElementById('btnClosePreview').addEventListener('click', function() {
-    document.getElementById('previewModal').style.display = 'none';
-  });
-  document.getElementById('btnCopyPreview').addEventListener('click', function() {
-    navigator.clipboard.writeText(buildSummaryText());
-    alert('Copied!');
-  });
-  document.getElementById('btnEmail').addEventListener('click', function() {
-    if (!state.email) { alert('Enter student email first.'); return; }
-    if (!confirm('Send feedback to ' + state.email + '?')) return;
-    setStatus('saving', 'Sending email...');
-    callBackend({ action: 'email', data: state }).then(function(res) {
-      if (res && res.success) { alert('Email sent!'); setStatus('saved', 'Email sent'); }
-      else { alert('Error: ' + (res ? res.error : 'Failed')); }
-    });
-  });
-
-  document.getElementById('btnHistory').addEventListener('click', function() {
-    document.getElementById('historyModal').style.display = 'flex';
-    var list = document.getElementById('historyList');
-    list.innerHTML = 'Loading...';
-    callBackend({ action: 'history' }).then(function(res) {
-      var exams = (res && res.exams) ? res.exams : [];
-      if (!exams.length) { list.innerHTML = '<p>No evaluations yet.</p>'; return; }
-      list.innerHTML = '';
-      exams.forEach(function(ex) {
-        var item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = '<div><strong>' + (ex.studentName || 'Unnamed') + '</strong> (' + (ex.dni || 'No ID') + ')<br>' +
-          '<small>' + (ex.subject || '') + ' • Grade: <b>' + (ex.finalGrade || '-') + '</b></small></div>' +
-          '<span style="font-size:0.75rem; color:#64748b;">' + ex.status + '</span>';
-        item.addEventListener('click', function() {
-          state = ex;
-          populateForm();
-          localStorage.setItem('oral_exam_current', JSON.stringify(state));
-          document.getElementById('historyModal').style.display = 'none';
-          setStatus('saved', 'Loaded');
-        });
-        list.appendChild(item);
-      });
-    });
-  });
-  document.getElementById('btnCloseHistory').addEventListener('click', function() {
-    document.getElementById('historyModal').style.display = 'none';
-  });
-
-  // Init
-  try {
-    var saved = localStorage.getItem('oral_exam_current');
-    if (saved) state = Object.assign(state, JSON.parse(saved));
-  } catch (e) {}
-  populateForm();
-  setStatus('saved', 'Ready');
-});
-</script>
-</body>
-</html>
+          <input
