@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oral Exam Evaluator</title>
+  <title>Oral Exam Evaluator (4-Candidate Panel)</title>
   <style>
     :root {
       --primary: #1e3a8a;
       --primary-light: #eff6ff;
-      --bg: #f1f5f9;
+      --bg: #e2e8f0;
       --card: #ffffff;
       --text: #1e293b;
       --muted: #64748b;
@@ -19,11 +19,12 @@
       --unsat: #b91c1c;
     }
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-size: 13px; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-size: 13px; padding-bottom: 30px; }
+    
     header {
-      background: var(--primary); color: white; padding: 6px 14px;
-      display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      background: var(--primary); color: white; padding: 8px 14px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
     .brand { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
     .status-badge {
@@ -34,49 +35,67 @@
     .dot.saved { background: #4ade80; }
     .dot.saving { background: #facc15; }
     .dot.offline { background: #f87171; }
-    .header-controls { display: flex; align-items: center; gap: 8px; }
+
+    .session-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .session-bar input {
+      background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3);
+      color: white; padding: 4px 8px; border-radius: 5px; font-size: 0.8rem; width: 145px;
+    }
+    .session-bar input::placeholder { color: rgba(255,255,255,0.7); }
+    .session-bar input:focus { outline: none; background: rgba(255,255,255,0.22); border-color: white; }
+
+    .container { max-width: 1280px; margin: 12px auto; padding: 0 10px; display: grid; gap: 16px; }
+
+    .slot-wrapper {
+      background: #f8fafc; border: 2px solid #94a3b8; border-radius: 10px;
+      overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .slot-header {
+      background: #334155; color: white; padding: 6px 12px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .slot-title { font-weight: 700; font-size: 0.85rem; letter-spacing: 0.03em; text-transform: uppercase; }
     .timer-box {
-      background: rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 6px;
-      display: flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums;
+      background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 6px;
+      display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums;
     }
     .timer-display { font-weight: 700; font-size: 0.9rem; min-width: 44px; text-align: center; }
     .btn-sm {
       background: rgba(255,255,255,0.2); border: 1px solid transparent; color: white;
-      padding: 3px 7px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600;
     }
     .btn-sm:hover { background: rgba(255,255,255,0.3); }
     .btn-rec-text { color: #fca5a5; }
     .btn-rec-text.recording-active {
-      border-color: #f87171;
-      background: rgba(220, 38, 38, 0.25);
-      color: #fecaca;
+      border-color: #f87171; background: rgba(220, 38, 38, 0.35); color: #fecaca;
     }
 
     .main-grid {
-      max-width: 1280px; margin: 8px auto; padding: 0 10px;
-      display: grid; grid-template-columns: 1.02fr 1fr; gap: 10px; align-items: start;
+      padding: 10px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 10px; align-items: start;
     }
     .col-stack { display: grid; gap: 10px; }
     .card {
       background: var(--card); border-radius: 8px; padding: 10px 12px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;
+      border: 1px solid #cbd5e1;
     }
     .card-title {
-      font-size: 0.78rem; font-weight: 700; color: var(--primary);
+      font-size: 0.76rem; font-weight: 700; color: var(--primary);
       text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px 0;
-      display: flex; justify-content: space-between; align-items: center;
     }
-    .session-lock-note { font-size: 0.68rem; color: var(--muted); font-weight: normal; text-transform: none; }
+
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
     .field { display: flex; flex-direction: column; gap: 2px; }
     label { font-size: 0.72rem; font-weight: 600; color: var(--muted); }
     input, textarea {
       padding: 5px 8px; border: 1px solid var(--border); border-radius: 5px;
-      font-size: 0.85rem; color: var(--text); width: 100%;
+      font-size: 0.85rem; color: var(--text); width: 100%; background: white;
     }
     input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(30,58,138,0.12); }
+
     .rubric-row {
-      display: grid; grid-template-columns: 130px 1fr; align-items: center;
+      display: grid; grid-template-columns: 125px 1fr; align-items: center;
       padding: 4px 0; border-bottom: 1px solid #f1f5f9; gap: 6px;
     }
     .rubric-row:last-child { border-bottom: none; padding-bottom: 0; }
@@ -92,34 +111,24 @@
     .scale-btn.active[data-val="Good"] { background: var(--good); color: white; border-color: var(--good); }
     .scale-btn.active[data-val="Fair"] { background: var(--fair); color: white; border-color: var(--fair); }
     .scale-btn.active[data-val="Unsatisfactory"] { background: var(--unsat); color: white; border-color: var(--unsat); }
+
     .chip-section { margin-bottom: 6px; }
     .chip-group-title { font-size: 0.68rem; font-weight: 700; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; }
     .chips-wrap { display: flex; flex-wrap: wrap; gap: 4px; }
     .chip {
       background: var(--primary-light); color: var(--primary); border: 1px solid #bfdbfe;
-      padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 12px; font-size: 0.74rem; font-weight: 600;
       cursor: pointer; user-select: none; transition: 0.08s;
     }
     .chip:active { transform: scale(0.95); background: #dbeafe; }
+
     textarea { font-family: 'Cambria', 'Segoe UI', serif; font-size: 0.92rem; line-height: 1.35; resize: vertical; }
-    .ai-box {
-      margin-top: 8px; background: #faf5ff; border: 1px solid #e9d5ff;
-      border-radius: 6px; padding: 7px 9px;
-    }
-    .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .ai-title { font-size: 0.72rem; font-weight: 700; color: #6b21a8; text-transform: uppercase; }
-    .btn-ai {
-      background: #7e22ce; color: white; border: none; border-radius: 4px;
-      padding: 3px 8px; font-size: 0.73rem; font-weight: 600; cursor: pointer;
-    }
-    .btn-ai:hover { background: #6b21a8; }
-    .btn-ai:disabled { opacity: 0.6; cursor: wait; }
-    #aiSummary { font-family: 'Segoe UI', sans-serif; font-size: 0.82rem; background: white; border-color: #d8b4fe; }
+
     .bottom-controls {
       display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
       gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9;
     }
-    .grade-box { width: 130px; }
+    .grade-box { width: 135px; }
     .actions-bar { display: flex; flex-wrap: wrap; gap: 5px; }
     .btn {
       padding: 6px 10px; border-radius: 6px; border: none; font-weight: 600;
@@ -131,6 +140,7 @@
     .btn-outline:hover { background: #f1f5f9; }
     .btn-mail { background: #0f766e; color: white; }
     .btn-mail:hover { background: #115e59; }
+
     .modal-backdrop {
       display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55);
       z-index: 200; align-items: center; justify-content: center; padding: 12px;
@@ -140,15 +150,11 @@
       max-height: 85vh; overflow-y: auto; padding: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
-    .history-item {
-      padding: 8px; border: 1px solid #e2e8f0; border-radius: 5px; margin-bottom: 6px;
-      display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-    }
-    .history-item:hover { background: var(--primary-light); border-color: #93c5fd; }
     pre.preview-box {
       background: #f8fafc; padding: 10px; border-radius: 5px; border: 1px solid #e2e8f0;
       white-space: pre-wrap; font-family: inherit; font-size: 0.82rem; margin: 0 0 10px 0;
     }
+
     @media (max-width: 820px) { .main-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -162,568 +168,562 @@
       <span id="statusText">Ready</span>
     </div>
   </div>
-  <div class="header-controls">
-    <div class="timer-box">
-      <span id="timerDisplay" class="timer-display">00:00</span>
-      <button type="button" class="btn-sm" id="btnStartTimer" title="Timer only">Start</button>
-      <button type="button" class="btn-sm btn-rec-text" id="btnStartRec" title="Timer + Local Audio Recording">Start</button>
-      <button type="button" class="btn-sm" id="btnReset">Reset</button>
-    </div>
-    <button type="button" class="btn-sm" id="btnHistory">History</button>
+
+  <div class="session-bar">
+    <input type="text" id="globalSubject" placeholder="Subject (e.g. Phonetics II)" oninput="handleSessionInput()">
+    <input type="text" id="globalCourse" placeholder="Course (e.g. Comm. A)" oninput="handleSessionInput()">
+    <input type="text" id="globalInstance" placeholder="Instance (e.g. Final)" oninput="handleSessionInput()">
   </div>
 </header>
 
-<div class="main-grid">
-  <div class="col-stack">
-    <div class="card">
-      <h2 class="card-title">
-        Session & Candidate
-        <span class="session-lock-note">Top row stays locked across exams</span>
-      </h2>
-      <div class="grid-3" style="margin-bottom: 7px;">
-        <div class="field"><label>Subject</label><input type="text" id="subject" placeholder="Phonetics II"></div>
-        <div class="field"><label>Course</label><input type="text" id="course" placeholder="Comm. A"></div>
-        <div class="field"><label>Instance</label><input type="text" id="instance" placeholder="Final Exam"></div>
-      </div>
-      <div class="grid-3">
-        <div class="field"><label>Student Name</label><input type="text" id="studentName" placeholder="Surname, Name"></div>
-        <div class="field"><label>DNI / ID</label><input type="text" id="dni" placeholder="ID Number"></div>
-        <div class="field"><label>Email (Optional)</label><input type="email" id="email" placeholder="student@mail.com"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">Assessment Rubric</h2>
-      <div class="rubric-row">
-        <div class="rubric-label">Pronunciation</div>
-        <div class="scale-group" data-criterion="pronunciation">
-          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
-        </div>
-      </div>
-      <div class="rubric-row">
-        <div class="rubric-label">Intonation</div>
-        <div class="scale-group" data-criterion="intonation">
-          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
-        </div>
-      </div>
-      <div class="rubric-row">
-        <div class="rubric-label">Fluency & Rhythm</div>
-        <div class="scale-group" data-criterion="fluency">
-          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
-        </div>
-      </div>
-      <div class="rubric-row">
-        <div class="rubric-label">Grammar</div>
-        <div class="scale-group" data-criterion="grammar">
-          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
-        </div>
-      </div>
-      <div class="rubric-row">
-        <div class="rubric-label">Vocabulary</div>
-        <div class="scale-group" data-criterion="vocabulary">
-          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
-        </div>
-      </div>
-      <div class="rubric-row">
-        <div class="rubric-label">Intelligibility</div>
-        <div class="scale-group" data-criterion="intelligibility">
-          <button type="button" class="scale-btn" data-val="Excellent">Excellent</button>
-          <button type="button" class="scale-btn" data-val="Good">Good</button>
-          <button type="button" class="scale-btn" data-val="Fair">Fair</button>
-          <button type="button" class="scale-btn" data-val="Unsatisfactory">Unsatisfactory</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-stack">
-    <div class="card">
-      <h2 class="card-title">Quick Tags & Observations</h2>
-      <div class="chip-section">
-        <div class="chip-group-title">Phonology & Prosody</div>
-        <div class="chips-wrap">
-          <span class="chip" data-tag="Pronunciation">+ Pronunciation</span>
-          <span class="chip" data-tag="Stress">+ Stress</span>
-          <span class="chip" data-tag="Tonality">+ Tonality</span>
-          <span class="chip" data-tag="Tonicity">+ Tonicity</span>
-        </div>
-      </div>
-      <div class="chip-section">
-        <div class="chip-group-title">Grammar & Lexis</div>
-        <div class="chips-wrap">
-          <span class="chip" data-tag="Tense">+ Tense</span>
-          <span class="chip" data-tag="Grammar">+ Grammar</span>
-          <span class="chip" data-tag="Syntax">+ Syntax</span>
-          <span class="chip" data-tag="Verb form">+ Verb form</span>
-          <span class="chip" data-tag="Form">+ Form</span>
-        </div>
-      </div>
-      <div class="chip-section">
-        <div class="chip-group-title">Fluency & Delivery</div>
-        <div class="chips-wrap">
-          <span class="chip" data-tag="Short Pause">+ Short Pause</span>
-          <span class="chip" data-tag="Long Pause">+ Long Pause</span>
-          <span class="chip" data-tag="Choppy speaking">+ Choppy speaking</span>
-          <span class="chip" data-tag="False start">+ False start</span>
-          <span class="chip" data-tag="Hesitant">+ Hesitant</span>
-        </div>
-      </div>
-      <div class="field" style="margin-top: 6px;">
-        <label>Notes (Tap tag to insert Tag + 24h time & new line)</label>
-        <textarea id="notes" rows="5" placeholder="Tap tags above or type observations..."></textarea>
-      </div>
-      <div class="ai-box">
-        <div class="ai-header">
-          <span class="ai-title">AI Error Summary</span>
-          <button type="button" class="btn-ai" id="btnAi">Generate AI Summary</button>
-        </div>
-        <textarea id="aiSummary" rows="3" placeholder="Click 'Generate AI Summary' to draft academic feedback..."></textarea>
-      </div>
-      <div class="bottom-controls">
-        <div class="field grade-box">
-          <label>Final Grade</label>
-          <input type="text" id="finalGrade" placeholder="e.g., 8 / Pass">
-        </div>
-        <div class="actions-bar">
-          <button type="button" class="btn btn-outline" id="btnPreview">Summary</button>
-          <button type="button" class="btn btn-mail" id="btnEmail">Email</button>
-          <button type="button" class="btn btn-primary" id="btnFinish">Finish & Next</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="container" id="slotsContainer"></div>
 
 <div class="modal-backdrop" id="previewModal">
   <div class="modal">
     <div class="modal-header">
       <strong>Clean Feedback Summary</strong>
-      <button type="button" class="btn btn-outline" id="btnClosePreview" style="padding:3px 8px;">Close</button>
+      <button type="button" class="btn btn-outline" onclick="closePreview()" style="padding:3px 8px;">Close</button>
     </div>
     <pre class="preview-box" id="previewContent"></pre>
     <div class="actions-bar" style="justify-content: flex-end;">
-      <button type="button" class="btn btn-primary" id="btnCopyPreview">Copy to Clipboard</button>
+      <button type="button" class="btn btn-primary" onclick="copyPreview()">Copy to Clipboard</button>
     </div>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="historyModal">
-  <div class="modal">
-    <div class="modal-header">
-      <strong>Recent Evaluations (Tap to Edit)</strong>
-      <button type="button" class="btn btn-outline" id="btnCloseHistory" style="padding:3px 8px;">Close</button>
-    </div>
-    <div id="historyList">Loading...</div>
   </div>
 </div>
 
 <script>
-window.addEventListener('DOMContentLoaded', function() {
-  var API_URL = 'https://script.google.com/macros/s/AKfycbxgW1EDLjQjsVttWWLNA_yI5pMVuRU69CMBdgi840QYYoK6XzbRIe2UimfY7RHIo-zc/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbxgW1EDLjQjsVttWWLNA_yI5pMVuRU69CMBdgi840QYYoK6XzbRIe2UimfY7RHIo-zc/exec';
+var NUM_SLOTS = 4;
+var RUBRIC_ITEMS = [
+  { key: 'pronunciation', label: 'Pronunciation' },
+  { key: 'intonation', label: 'Intonation' },
+  { key: 'fluency', label: 'Fluency & Rhythm' },
+  { key: 'grammar', label: 'Grammar' },
+  { key: 'vocabulary', label: 'Vocabulary' },
+  { key: 'intelligibility', label: 'Intelligibility' }
+];
+var SCALE_LEVELS = ['Excellent', 'Good', 'Fair', 'Unsatisfactory'];
 
-  var state = {
-    examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+var sessionInfo = { subject: '', course: '', instance: '' };
+var slots = [];
+var runtime = [];
+
+function createBlankState(idx) {
+  return {
+    examId: 'EX-' + Date.now() + '-S' + (idx + 1) + '-' + Math.floor(Math.random() * 1000),
     date: new Date().toLocaleDateString('en-GB'),
     duration: '00:00',
-    subject: '',
-    course: '',
-    instance: '',
+    subject: sessionInfo.subject,
+    course: sessionInfo.course,
+    instance: sessionInfo.instance,
     studentName: '',
     dni: '',
     email: '',
     rubric: {},
     notes: '',
-    aiSummary: '',
     audioUrl: '',
     finalGrade: '',
     status: 'In Progress'
   };
+}
 
-  var syncTimeout = null;
-  var timerInterval = null;
-  var secondsElapsed = 0;
-  var activeMode = null;
+function createRuntime() {
+  return {
+    syncTimeout: null,
+    timerInterval: null,
+    secondsElapsed: 0,
+    activeMode: null,
+    mediaRecorder: null,
+    audioChunks: [],
+    audioStream: null,
+    recordedMimeType: 'audio/webm'
+  };
+}
 
-  var mediaRecorder = null;
-  var audioChunks = [];
-  var audioStream = null;
-  var recordedMimeType = 'audio/webm';
+function buildSlotsHTML() {
+  var container = document.getElementById('slotsContainer');
+  var html = '';
 
-  function setStatus(type, text) {
-    document.getElementById('statusDot').className = 'dot ' + type;
-    document.getElementById('statusText').textContent = text;
+  for (var i = 0; i < NUM_SLOTS; i++) {
+    var rubricRows = '';
+    for (var r = 0; r < RUBRIC_ITEMS.length; r++) {
+      var crit = RUBRIC_ITEMS[r];
+      var btns = '';
+      for (var s = 0; s < SCALE_LEVELS.length; s++) {
+        var lvl = SCALE_LEVELS[s];
+        btns += '<button type="button" class="scale-btn" data-val="' + lvl + '" onclick="selectRubric(' + i + ',\'' + crit.key + '\',\'' + lvl + '\')">' + lvl + '</button>';
+      }
+      rubricRows += '<div class="rubric-row"><div class="rubric-label">' + crit.label + '</div><div class="scale-group" id="scale-' + i + '-' + crit.key + '">' + btns + '</div></div>';
+    }
+
+    html +=
+      '<div class="slot-wrapper">' +
+        '<div class="slot-header">' +
+          '<span class="slot-title">Candidate ' + (i + 1) + '</span>' +
+          '<div class="timer-box">' +
+            '<span id="timerDisplay-' + i + '" class="timer-display">00:00</span>' +
+            '<button type="button" class="btn-sm" id="btnStartTimer-' + i + '" onclick="toggleTimerOnly(' + i + ')" title="Timer only">Start</button>' +
+            '<button type="button" class="btn-sm btn-rec-text" id="btnStartRec-' + i + '" onclick="toggleTimerRec(' + i + ')" title="Timer + Audio Recording">Start</button>' +
+            '<button type="button" class="btn-sm" onclick="resetSlotTimer(' + i + ')">Reset</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="main-grid">' +
+          '<div class="col-stack">' +
+            '<div class="card">' +
+              '<h2 class="card-title">Candidate Details</h2>' +
+              '<div class="grid-3">' +
+                '<div class="field"><label>Student Name</label><input type="text" id="studentName-' + i + '" placeholder="Surname, Name" oninput="handleSlotInput(' + i + ')"></div>' +
+                '<div class="field"><label>DNI / ID</label><input type="text" id="dni-' + i + '" placeholder="ID Number" oninput="handleSlotInput(' + i + ')"></div>' +
+                '<div class="field"><label>Email (Optional)</label><input type="email" id="email-' + i + '" placeholder="student@mail.com" oninput="handleSlotInput(' + i + ')"></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="card">' +
+              '<h2 class="card-title">Assessment Rubric</h2>' +
+              rubricRows +
+            '</div>' +
+          '</div>' +
+          '<div class="col-stack">' +
+            '<div class="card">' +
+              '<h2 class="card-title">Quick Tags & Observations</h2>' +
+              '<div class="chip-section">' +
+                '<div class="chip-group-title">Phonology & Prosody</div>' +
+                '<div class="chips-wrap">' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Pronunciation\')">+ Pronunciation</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Stress\')">+ Stress</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Tonality\')">+ Tonality</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Tonicity\')">+ Tonicity</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="chip-section">' +
+                '<div class="chip-group-title">Grammar & Lexis</div>' +
+                '<div class="chips-wrap">' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Tense\')">+ Tense</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Grammar\')">+ Grammar</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Syntax\')">+ Syntax</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Verb form\')">+ Verb form</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Form\')">+ Form</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Missing subject\')">+ Missing subject</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Missing object\')">+ Missing object</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Missing verb\')">+ Missing verb</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="chip-section">' +
+                '<div class="chip-group-title">Fluency & Delivery</div>' +
+                '<div class="chips-wrap">' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Short Pause\')">+ Short Pause</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Long Pause\')">+ Long Pause</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Choppy speaking\')">+ Choppy speaking</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'False start\')">+ False start</span>' +
+                  '<span class="chip" onclick="appendTag(' + i + ',\'Hesitant\')">+ Hesitant</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="field" style="margin-top: 6px;">' +
+                '<label>Notes (Type TTT for [HH:MM:SS] • Tags auto-insert time & new line)</label>' +
+                '<textarea id="notes-' + i + '" rows="6" placeholder="Tap tags above or type observations (type TTT for timestamp)..." oninput="handleNotesInput(' + i + ')"></textarea>' +
+              '</div>' +
+              '<div class="bottom-controls">' +
+                '<div class="field grade-box">' +
+                  '<label>Final Grade</label>' +
+                  '<input type="text" id="finalGrade-' + i + '" placeholder="e.g., 8 / Pass" oninput="handleSlotInput(' + i + ')">' +
+                '</div>' +
+                '<div class="actions-bar">' +
+                  '<button type="button" class="btn btn-outline" onclick="openPreview(' + i + ')">Summary</button>' +
+                  '<button type="button" class="btn btn-mail" onclick="sendSlotEmail(' + i + ')">Email</button>' +
+                  '<button type="button" class="btn btn-primary" onclick="finishSlotExam(' + i + ')">Finish & Clear</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
   }
+  container.innerHTML = html;
+}
 
-  function getNow24() {
-    var d = new Date();
-    return String(d.getHours()).padStart(2, '0') + ':' +
-           String(d.getMinutes()).padStart(2, '0') + ':' +
-           String(d.getSeconds()).padStart(2, '0');
+function setStatus(type, text) {
+  document.getElementById('statusDot').className = 'dot ' + type;
+  document.getElementById('statusText').textContent = text;
+}
+
+function getNow24() {
+  var d = new Date();
+  return String(d.getHours()).padStart(2, '0') + ':' +
+         String(d.getMinutes()).padStart(2, '0') + ':' +
+         String(d.getSeconds()).padStart(2, '0');
+}
+
+function callBackend(payload) {
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).then(function(res) { return res.json(); });
+}
+
+function saveToLocal() {
+  try {
+    localStorage.setItem('oral_exam_session_v3', JSON.stringify(sessionInfo));
+    localStorage.setItem('oral_exam_slots_v3', JSON.stringify(slots));
+  } catch (e) {}
+}
+
+function syncSlotToCloud(idx, callback) {
+  if (!navigator.onLine) { setStatus('offline', 'Offline (Local)'); return; }
+  slots[idx].subject = sessionInfo.subject;
+  slots[idx].course = sessionInfo.course;
+  slots[idx].instance = sessionInfo.instance;
+
+  callBackend({ action: 'upsert', data: slots[idx] })
+    .then(function(res) {
+      if (res && res.success) {
+        setStatus('saved', 'Saved ' + res.timestamp);
+        if (callback) callback();
+      } else {
+        setStatus('offline', 'Sync error');
+      }
+    })
+    .catch(function() { setStatus('offline', 'Sync failed'); });
+}
+
+function triggerSlotSave(idx) {
+  saveToLocal();
+  setStatus('saving', 'Saving C' + (idx + 1) + '...');
+  clearTimeout(runtime[idx].syncTimeout);
+  runtime[idx].syncTimeout = setTimeout(function() {
+    syncSlotToCloud(idx);
+  }, 1500);
+}
+
+function handleSessionInput() {
+  sessionInfo.subject = document.getElementById('globalSubject').value;
+  sessionInfo.course = document.getElementById('globalCourse').value;
+  sessionInfo.instance = document.getElementById('globalInstance').value;
+  saveToLocal();
+
+  for (var i = 0; i < NUM_SLOTS; i++) {
+    slots[i].subject = sessionInfo.subject;
+    slots[i].course = sessionInfo.course;
+    slots[i].instance = sessionInfo.instance;
+    if (slots[i].studentName || slots[i].notes || slots[i].finalGrade) {
+      triggerSlotSave(i);
+    }
   }
+}
 
-  function callBackend(payload) {
-    return fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    }).then(function(res) { return res.json(); });
+function handleNotesInput(idx) {
+  var ta = document.getElementById('notes-' + idx);
+  var val = ta.value;
+  if (/ttt/i.test(val)) {
+    var cursor = ta.selectionStart;
+    var stamp = '[' + getNow24() + ']';
+    var before = val.slice(0, cursor);
+    var after = val.slice(cursor);
+    var newBefore = before.replace(/ttt/i, stamp);
+    if (newBefore !== before) {
+      ta.value = newBefore + after;
+      ta.selectionStart = ta.selectionEnd = newBefore.length;
+    } else {
+      ta.value = val.replace(/ttt/i, stamp);
+    }
   }
+  handleSlotInput(idx);
+}
 
-  function updateRubricUI() {
-    document.querySelectorAll('.scale-group').forEach(function(group) {
-      var crit = group.getAttribute('data-criterion');
-      group.querySelectorAll('.scale-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.getAttribute('data-val') === state.rubric[crit]);
-      });
-    });
+function handleSlotInput(idx) {
+  slots[idx].studentName = document.getElementById('studentName-' + idx).value;
+  slots[idx].dni = document.getElementById('dni-' + idx).value;
+  slots[idx].email = document.getElementById('email-' + idx).value;
+  slots[idx].notes = document.getElementById('notes-' + idx).value;
+  slots[idx].finalGrade = document.getElementById('finalGrade-' + idx).value;
+  triggerSlotSave(idx);
+}
+
+function selectRubric(idx, crit, val) {
+  if (!slots[idx].rubric) slots[idx].rubric = {};
+  slots[idx].rubric[crit] = (slots[idx].rubric[crit] === val) ? '' : val;
+  updateSlotRubricUI(idx);
+  triggerSlotSave(idx);
+}
+
+function updateSlotRubricUI(idx) {
+  var r = slots[idx].rubric || {};
+  for (var i = 0; i < RUBRIC_ITEMS.length; i++) {
+    var key = RUBRIC_ITEMS[i].key;
+    var group = document.getElementById('scale-' + idx + '-' + key);
+    if (!group) continue;
+    var btns = group.children;
+    for (var j = 0; j < btns.length; j++) {
+      btns[j].classList.toggle('active', btns[j].getAttribute('data-val') === r[key]);
+    }
   }
+}
 
-  function populateForm() {
-    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
-      document.getElementById(id).value = state[id] || '';
-    });
-    updateRubricUI();
+function appendTag(idx, tag) {
+  var ta = document.getElementById('notes-' + idx);
+  var prefix = (ta.value.length > 0 && ta.value.slice(-1) !== '\n') ? '\n' : '';
+  ta.value = ta.value + prefix + tag + ' [' + getNow24() + ']\n';
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = ta.value.length;
+  ta.scrollTop = ta.scrollHeight;
+  handleSlotInput(idx);
+}
+
+function populateSlotForm(idx) {
+  var st = slots[idx];
+  document.getElementById('studentName-' + idx).value = st.studentName || '';
+  document.getElementById('dni-' + idx).value = st.dni || '';
+  document.getElementById('email-' + idx).value = st.email || '';
+  document.getElementById('notes-' + idx).value = st.notes || '';
+  document.getElementById('finalGrade-' + idx).value = st.finalGrade || '';
+  updateSlotRubricUI(idx);
+}
+
+function startOrResumeAudio(idx) {
+  var rt = runtime[idx];
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Microphone is not supported in this browser.');
+    return;
   }
-
-  function syncToCloud(callback) {
-    if (!navigator.onLine) { setStatus('offline', 'Offline (Local)'); return; }
-    callBackend({ action: 'upsert', data: state })
-      .then(function(res) {
-        if (res && res.success) {
-          setStatus('saved', 'Saved ' + res.timestamp);
-          if (callback) callback();
-        } else {
-          setStatus('offline', 'Sync error');
-        }
+  if (!rt.mediaRecorder) {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function(stream) {
+        rt.audioStream = stream;
+        var options = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm')) ? { mimeType: 'audio/webm' } : {};
+        rt.mediaRecorder = new MediaRecorder(rt.audioStream, options);
+        rt.recordedMimeType = rt.mediaRecorder.mimeType || 'audio/webm';
+        rt.audioChunks = [];
+        rt.mediaRecorder.ondataavailable = function(e) {
+          if (e.data && e.data.size > 0) rt.audioChunks.push(e.data);
+        };
+        rt.mediaRecorder.start(1000);
+        document.getElementById('btnStartRec-' + idx).classList.add('recording-active');
       })
-      .catch(function() { setStatus('offline', 'Sync failed'); });
+      .catch(function(err) {
+        alert('Microphone permission denied: ' + err.name);
+      });
+  } else if (rt.mediaRecorder.state === 'paused') {
+    rt.mediaRecorder.resume();
+    document.getElementById('btnStartRec-' + idx).classList.add('recording-active');
+  }
+}
+
+function pauseSlotAudio(idx) {
+  var rt = runtime[idx];
+  if (rt.mediaRecorder && rt.mediaRecorder.state === 'recording') {
+    rt.mediaRecorder.pause();
+  }
+  document.getElementById('btnStartRec-' + idx).classList.remove('recording-active');
+}
+
+function discardSlotAudio(idx) {
+  var rt = runtime[idx];
+  if (rt.mediaRecorder) {
+    if (rt.mediaRecorder.state !== 'inactive') rt.mediaRecorder.stop();
+    rt.mediaRecorder = null;
+  }
+  if (rt.audioStream) {
+    rt.audioStream.getTracks().forEach(function(t) { t.stop(); });
+    rt.audioStream = null;
+  }
+  rt.audioChunks = [];
+  document.getElementById('btnStartRec-' + idx).classList.remove('recording-active');
+}
+
+function downloadSlotAudioLocally(idx, doneCallback) {
+  var rt = runtime[idx];
+  var st = slots[idx];
+  if (!rt.mediaRecorder || rt.mediaRecorder.state === 'inactive') {
+    discardSlotAudio(idx);
+    doneCallback(null);
+    return;
   }
 
-  function triggerSave() {
-    try {
-      localStorage.setItem('oral_exam_current', JSON.stringify(state));
-      localStorage.setItem('oral_exam_session', JSON.stringify({
-        subject: state.subject, course: state.course, instance: state.instance
-      }));
-    } catch (e) {}
-    setStatus('saving', 'Saving...');
-    clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(syncToCloud, 1500);
-  }
-
-  function handleInput() {
-    ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
-      state[id] = document.getElementById(id).value;
-    });
-    triggerSave();
-  }
-
-  ['subject','course','instance','studentName','dni','email','notes','aiSummary','finalGrade'].forEach(function(id) {
-    document.getElementById(id).addEventListener('input', handleInput);
-  });
-
-  document.querySelectorAll('.scale-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var crit = btn.parentElement.getAttribute('data-criterion');
-      var val = btn.getAttribute('data-val');
-      state.rubric[crit] = (state.rubric[crit] === val) ? '' : val;
-      updateRubricUI();
-      triggerSave();
-    });
-  });
-
-  document.querySelectorAll('.chip').forEach(function(chip) {
-    chip.addEventListener('click', function() {
-      var tag = chip.getAttribute('data-tag');
-      var ta = document.getElementById('notes');
-      var prefix = (ta.value.length > 0 && ta.value.slice(-1) !== '\n') ? '\n' : '';
-      ta.value = ta.value + prefix + tag + ' [' + getNow24() + ']\n';
-      ta.focus();
-      ta.selectionStart = ta.selectionEnd = ta.value.length;
-      ta.scrollTop = ta.scrollHeight;
-      handleInput();
-    });
-  });
-
-  function startOrResumeAudio() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Microphone is not supported in this browser.');
-      return;
-    }
-    if (!mediaRecorder) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-          audioStream = stream;
-          var options = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm')) ? { mimeType: 'audio/webm' } : {};
-          mediaRecorder = new MediaRecorder(audioStream, options);
-          recordedMimeType = mediaRecorder.mimeType || 'audio/webm';
-          audioChunks = [];
-          mediaRecorder.ondataavailable = function(e) {
-            if (e.data && e.data.size > 0) audioChunks.push(e.data);
-          };
-          mediaRecorder.start(1000);
-          document.getElementById('btnStartRec').classList.add('recording-active');
-        })
-        .catch(function(err) {
-          alert('Microphone permission denied: ' + err.name);
-        });
-    } else if (mediaRecorder.state === 'paused') {
-      mediaRecorder.resume();
-      document.getElementById('btnStartRec').classList.add('recording-active');
-    }
-  }
-
-  function pauseAudio() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.pause();
-    }
-    document.getElementById('btnStartRec').classList.remove('recording-active');
-  }
-
-  function discardAudio() {
-    if (mediaRecorder) {
-      if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-      mediaRecorder = null;
-    }
-    if (audioStream) {
-      audioStream.getTracks().forEach(function(t) { t.stop(); });
-      audioStream = null;
-    }
-    audioChunks = [];
-    document.getElementById('btnStartRec').classList.remove('recording-active');
-  }
-
-  function downloadAudioLocally(doneCallback) {
-    if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-      discardAudio();
+  rt.mediaRecorder.onstop = function() {
+    if (!rt.audioChunks || rt.audioChunks.length === 0) {
+      discardSlotAudio(idx);
       doneCallback(null);
       return;
     }
 
-    mediaRecorder.onstop = function() {
-      if (!audioChunks || audioChunks.length === 0) {
-        discardAudio();
-        doneCallback(null);
-        return;
-      }
+    var blob = new Blob(rt.audioChunks, { type: rt.recordedMimeType });
+    var safeName = (st.studentName || ('Candidate_' + (idx + 1))).replace(/[^a-zA-Z0-9_-]/g, '_');
+    var safeDni = (st.dni || 'NoID').replace(/[^a-zA-Z0-9_-]/g, '_');
+    var fileName = st.date.replace(/\//g, '-') + '_' + safeName + '_' + safeDni + '_' + st.examId + '.webm';
 
-      var blob = new Blob(audioChunks, { type: recordedMimeType });
-      var safeName = (state.studentName || 'Student').replace(/[^a-zA-Z0-9_-]/g, '_');
-      var safeDni = (state.dni || 'NoID').replace(/[^a-zA-Z0-9_-]/g, '_');
-      var fileName = state.date.replace(/\//g, '-') + '_' + safeName + '_' + safeDni + '_' + state.examId + '.webm';
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
 
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      discardSlotAudio(idx);
+      doneCallback('Local file: ' + fileName);
+    }, 400);
+  };
 
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        discardAudio();
-        doneCallback('Local file: ' + fileName);
-      }, 400);
-    };
+  try { rt.mediaRecorder.requestData(); } catch (e) {}
+  rt.mediaRecorder.stop();
+}
 
-    try { mediaRecorder.requestData(); } catch (e) {}
-    mediaRecorder.stop();
+function startSlotInterval(idx) {
+  var rt = runtime[idx];
+  clearInterval(rt.timerInterval);
+  rt.timerInterval = setInterval(function() {
+    rt.secondsElapsed++;
+    updateSlotTimerDisplay(idx);
+  }, 1000);
+}
+
+function pauseSlotAll(idx) {
+  var rt = runtime[idx];
+  rt.activeMode = null;
+  clearInterval(rt.timerInterval);
+  document.getElementById('btnStartTimer-' + idx).textContent = 'Start';
+  document.getElementById('btnStartRec-' + idx).textContent = 'Start';
+  pauseSlotAudio(idx);
+}
+
+function updateSlotTimerDisplay(idx) {
+  var rt = runtime[idx];
+  var formatted = String(Math.floor(rt.secondsElapsed / 60)).padStart(2, '0') + ':' + String(rt.secondsElapsed % 60).padStart(2, '0');
+  document.getElementById('timerDisplay-' + idx).textContent = formatted;
+  slots[idx].duration = formatted;
+}
+
+function toggleTimerOnly(idx) {
+  var rt = runtime[idx];
+  if (rt.activeMode === 'timer') {
+    pauseSlotAll(idx);
+  } else {
+    pauseSlotAudio(idx);
+    rt.activeMode = 'timer';
+    document.getElementById('btnStartTimer-' + idx).textContent = 'Pause';
+    document.getElementById('btnStartRec-' + idx).textContent = 'Start';
+    startSlotInterval(idx);
   }
+}
 
-  function startInterval() {
-    clearInterval(timerInterval);
-    timerInterval = setInterval(function() {
-      secondsElapsed++;
-      updateTimerDisplay();
-    }, 1000);
+function toggleTimerRec(idx) {
+  var rt = runtime[idx];
+  if (rt.activeMode === 'rec') {
+    pauseSlotAll(idx);
+  } else {
+    rt.activeMode = 'rec';
+    document.getElementById('btnStartRec-' + idx).textContent = 'Pause';
+    document.getElementById('btnStartTimer-' + idx).textContent = 'Start';
+    startOrResumeAudio(idx);
+    startSlotInterval(idx);
   }
+}
 
-  function pauseAll() {
-    activeMode = null;
-    clearInterval(timerInterval);
-    document.getElementById('btnStartTimer').textContent = 'Start';
-    document.getElementById('btnStartRec').textContent = 'Start';
-    pauseAudio();
-  }
+function resetSlotTimer(idx) {
+  pauseSlotAll(idx);
+  runtime[idx].secondsElapsed = 0;
+  updateSlotTimerDisplay(idx);
+  discardSlotAudio(idx);
+}
 
-  function updateTimerDisplay() {
-    var formatted = String(Math.floor(secondsElapsed / 60)).padStart(2, '0') + ':' + String(secondsElapsed % 60).padStart(2, '0');
-    document.getElementById('timerDisplay').textContent = formatted;
-    state.duration = formatted;
-  }
+function finishSlotExam(idx) {
+  var nameLabel = slots[idx].studentName || ('Candidate ' + (idx + 1));
+  if (!confirm('Complete evaluation for ' + nameLabel + ' and clear this panel?')) return;
+  pauseSlotAll(idx);
+  slots[idx].status = 'Completed';
+  setStatus('saving', 'Finalizing C' + (idx + 1) + '...');
 
-  document.getElementById('btnStartTimer').addEventListener('click', function() {
-    if (activeMode === 'timer') {
-      pauseAll();
-    } else {
-      pauseAudio();
-      activeMode = 'timer';
-      document.getElementById('btnStartTimer').textContent = 'Pause';
-      document.getElementById('btnStartRec').textContent = 'Start';
-      startInterval();
+  downloadSlotAudioLocally(idx, function(localFileLabel) {
+    if (localFileLabel) {
+      slots[idx].audioUrl = localFileLabel;
     }
-  });
-
-  document.getElementById('btnStartRec').addEventListener('click', function() {
-    if (activeMode === 'rec') {
-      pauseAll();
-    } else {
-      activeMode = 'rec';
-      document.getElementById('btnStartRec').textContent = 'Pause';
-      document.getElementById('btnStartTimer').textContent = 'Start';
-      startOrResumeAudio();
-      startInterval();
-    }
-  });
-
-  document.getElementById('btnReset').addEventListener('click', function() {
-    pauseAll();
-    secondsElapsed = 0;
-    updateTimerDisplay();
-    discardAudio();
-  });
-
-  document.getElementById('btnAi').addEventListener('click', function() {
-    var btn = this;
-    btn.disabled = true;
-    btn.textContent = 'Generating...';
-    setStatus('saving', 'Calling Gemini...');
-    callBackend({ action: 'ai', data: state })
-      .then(function(res) {
-        btn.disabled = false;
-        btn.textContent = 'Generate AI Summary';
-        if (res && res.success) {
-          document.getElementById('aiSummary').value = res.summary;
-          handleInput();
-        } else {
-          alert('AI Error: ' + (res ? res.error : 'Unknown'));
-          setStatus('saved', 'Ready');
-        }
-      })
-      .catch(function(err) {
-        btn.disabled = false;
-        btn.textContent = 'Generate AI Summary';
-        alert('Connection error: ' + err);
-      });
-  });
-
-  document.getElementById('btnFinish').addEventListener('click', function() {
-    if (!confirm('Complete exam and start next?')) return;
-    pauseAll();
-    state.status = 'Completed';
-    setStatus('saving', 'Finalizing...');
-
-    downloadAudioLocally(function(localFileLabel) {
-      if (localFileLabel) {
-        state.audioUrl = localFileLabel;
-      }
-      syncToCloud(function() {
-        state = {
-          examId: 'EX-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-          date: new Date().toLocaleDateString('en-GB'),
-          duration: '00:00',
-          subject: state.subject,
-          course: state.course,
-          instance: state.instance,
-          studentName: '', dni: '', email: '', rubric: {}, notes: '', aiSummary: '', audioUrl: '', finalGrade: '',
-          status: 'In Progress'
-        };
-        secondsElapsed = 0;
-        updateTimerDisplay();
-        localStorage.setItem('oral_exam_current', JSON.stringify(state));
-        populateForm();
-        setStatus('saved', 'Ready');
-      });
+    syncSlotToCloud(idx, function() {
+      slots[idx] = createBlankState(idx);
+      runtime[idx].secondsElapsed = 0;
+      updateSlotTimerDisplay(idx);
+      saveToLocal();
+      populateSlotForm(idx);
+      setStatus('saved', 'Ready');
     });
   });
+}
 
-  function buildSummaryText() {
-    var r = state.rubric || {};
-    return 'ORAL EXAM FEEDBACK\nStudent: ' + (state.studentName || '-') + ' (ID: ' + (state.dni || '-') + ')\n' +
-      'Subject: ' + (state.subject || '-') + ' | Course: ' + (state.course || '-') + ' | Instance: ' + (state.instance || '-') + '\n' +
-      'Date: ' + state.date + ' | Duration: ' + state.duration + '\n\nRUBRIC:\n' +
-      '• Pronunciation: ' + (r.pronunciation || '-') + '\n• Intonation: ' + (r.intonation || '-') + '\n' +
-      '• Fluency & Rhythm: ' + (r.fluency || '-') + '\n• Grammar: ' + (r.grammar || '-') + '\n' +
-      '• Vocabulary: ' + (r.vocabulary || '-') + '\n• Intelligibility: ' + (r.intelligibility || '-') + '\n\n' +
-      'FINAL GRADE: ' + (state.finalGrade || 'Pending') + '\n\n' +
-      (state.aiSummary ? 'FEEDBACK SUMMARY:\n' + state.aiSummary + '\n\n' : '') +
-      'NOTES:\n' + (state.notes || 'None');
+function buildSummaryText(idx) {
+  var st = slots[idx];
+  var r = st.rubric || {};
+  return 'ORAL EXAM FEEDBACK\nStudent: ' + (st.studentName || '-') + ' (ID: ' + (st.dni || '-') + ')\n' +
+    'Subject: ' + (sessionInfo.subject || '-') + ' | Course: ' + (sessionInfo.course || '-') + ' | Instance: ' + (sessionInfo.instance || '-') + '\n' +
+    'Date: ' + st.date + ' | Duration: ' + st.duration + '\n\nRUBRIC:\n' +
+    '• Pronunciation: ' + (r.pronunciation || '-') + '\n• Intonation: ' + (r.intonation || '-') + '\n' +
+    '• Fluency & Rhythm: ' + (r.fluency || '-') + '\n• Grammar: ' + (r.grammar || '-') + '\n' +
+    '• Vocabulary: ' + (r.vocabulary || '-') + '\n• Intelligibility: ' + (r.intelligibility || '-') + '\n\n' +
+    'FINAL GRADE: ' + (st.finalGrade || 'Pending') + '\n\n' +
+    'NOTES:\n' + (st.notes || 'None');
+}
+
+var currentPreviewText = '';
+
+function openPreview(idx) {
+  currentPreviewText = buildSummaryText(idx);
+  document.getElementById('previewContent').textContent = currentPreviewText;
+  document.getElementById('previewModal').style.display = 'flex';
+}
+
+function closePreview() {
+  document.getElementById('previewModal').style.display = 'none';
+}
+
+function copyPreview() {
+  navigator.clipboard.writeText(currentPreviewText);
+  alert('Copied!');
+}
+
+function sendSlotEmail(idx) {
+  var st = slots[idx];
+  st.subject = sessionInfo.subject;
+  st.course = sessionInfo.course;
+  st.instance = sessionInfo.instance;
+
+  if (!st.email) { alert('Enter student email first.'); return; }
+  if (!confirm('Send feedback to ' + st.email + '?')) return;
+  setStatus('saving', 'Sending email...');
+  callBackend({ action: 'email', data: st }).then(function(res) {
+    if (res && res.success) { alert('Email sent!'); setStatus('saved', 'Email sent'); }
+    else { alert('Error: ' + (res ? res.error : 'Failed')); }
+  });
+}
+
+// Init
+try {
+  var savedSession = localStorage.getItem('oral_exam_session_v3');
+  if (savedSession) sessionInfo = Object.assign(sessionInfo, JSON.parse(savedSession));
+} catch (e) {}
+
+document.getElementById('globalSubject').value = sessionInfo.subject || '';
+document.getElementById('globalCourse').value = sessionInfo.course || '';
+document.getElementById('globalInstance').value = sessionInfo.instance || '';
+
+var savedSlots = null;
+try {
+  var rawSlots = localStorage.getItem('oral_exam_slots_v3');
+  if (rawSlots) savedSlots = JSON.parse(rawSlots);
+} catch (e) {}
+
+for (var k = 0; k < NUM_SLOTS; k++) {
+  runtime.push(createRuntime());
+  if (savedSlots && savedSlots[k]) {
+    slots.push(Object.assign(createBlankState(k), savedSlots[k]));
+  } else {
+    slots.push(createBlankState(k));
   }
+}
 
-  document.getElementById('btnPreview').addEventListener('click', function() {
-    document.getElementById('previewContent').textContent = buildSummaryText();
-    document.getElementById('previewModal').style.display = 'flex';
-  });
-  document.getElementById('btnClosePreview').addEventListener('click', function() {
-    document.getElementById('previewModal').style.display = 'none';
-  });
-  document.getElementById('btnCopyPreview').addEventListener('click', function() {
-    navigator.clipboard.writeText(buildSummaryText());
-    alert('Copied!');
-  });
-  document.getElementById('btnEmail').addEventListener('click', function() {
-    if (!state.email) { alert('Enter student email first.'); return; }
-    if (!confirm('Send feedback to ' + state.email + '?')) return;
-    setStatus('saving', 'Sending email...');
-    callBackend({ action: 'email', data: state }).then(function(res) {
-      if (res && res.success) { alert('Email sent!'); setStatus('saved', 'Email sent'); }
-      else { alert('Error: ' + (res ? res.error : 'Failed')); }
-    });
-  });
-
-  document.getElementById('btnHistory').addEventListener('click', function() {
-    document.getElementById('historyModal').style.display = 'flex';
-    var list = document.getElementById('historyList');
-    list.innerHTML = 'Loading...';
-    callBackend({ action: 'history' }).then(function(res) {
-      var exams = (res && res.exams) ? res.exams : [];
-      if (!exams.length) { list.innerHTML = '<p>No evaluations yet.</p>'; return; }
-      list.innerHTML = '';
-      exams.forEach(function(ex) {
-        var item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = '<div><strong>' + (ex.studentName || 'Unnamed') + '</strong> (' + (ex.dni || 'No ID') + ')<br>' +
-          '<small>' + (ex.subject || '') + ' • Grade: <b>' + (ex.finalGrade || '-') + '</b></small></div>' +
-          '<span style="font-size:0.75rem; color:#64748b;">' + ex.status + '</span>';
-        item.addEventListener('click', function() {
-          state = ex;
-          populateForm();
-          localStorage.setItem('oral_exam_current', JSON.stringify(state));
-          document.getElementById('historyModal').style.display = 'none';
-          setStatus('saved', 'Loaded');
-        });
-        list.appendChild(item);
-      });
-    });
-  });
-  document.getElementById('btnCloseHistory').addEventListener('click', function() {
-    document.getElementById('historyModal').style.display = 'none';
-  });
-
-  try {
-    var saved = localStorage.getItem('oral_exam_current');
-    if (saved) state = Object.assign(state, JSON.parse(saved));
-  } catch (e) {}
-  populateForm();
-  setStatus('saved', 'Ready');
-});
+buildSlotsHTML();
+for (var m = 0; m < NUM_SLOTS; m++) {
+  populateSlotForm(m);
+}
 </script>
 </body>
 </html>
